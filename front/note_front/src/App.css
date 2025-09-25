@@ -34,3 +34,109 @@
     right: 0;
     z-index: 100;
 }
+
+.note-on-board {
+    width: 200px;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    background-color: yellow;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+}
+
+.note-on-board-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+    margin-top: 0px;
+    font-size: 22px;
+}
+
+.note-on-board-contentPreview {
+    margin: 0;
+    font-size: 16px;
+    white-space: normal;
+    word-wrap: break-word;
+    text-align: left;
+}
+.popup-vue-note {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    height: 80%;
+    padding: 15px;
+    background-color: yellow;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+}
+
+.note-vue-header {
+    display: flex    ;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+
+.note-vue-header-first-chield{
+    display: flex;
+    text-align: left;
+    flex-direction: column;
+    align-content: flex-start;
+    align-items: flex-start;
+}
+
+.note-vue-content {
+    height: 80%;
+    white-space: normal;
+    word-wrap: break-word;
+    text-align: left;
+}
+
+.popup-vue-note input{
+
+  background-color: white;
+  border: 1px solid;
+  padding: 0px 10px;
+  border-radius: 5px;
+}
+
+.note-vue-title,
+.note-vue-content {
+  width: 100%;
+  align-text: left;
+  font-family: inherit;
+  font-size: inherit;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-sizing: border-box;
+}
+
+textarea.note-vue-content {
+  resize: none;
+  padding: 0px 10px;
+  background-color: white;
+  border: 1px solid;
+  border-radius: 5px;
+}
+
+.editable {
+  background-color: #fff;
+  padding: 5px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.error-field {
+  border-color: red;
+}
+
+.error-message {
+  color: red;
+  font-size: 14px;
+  margin: 5px 0 0 0;
+}

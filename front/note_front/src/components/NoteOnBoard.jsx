@@ -1,4 +1,4 @@
-function NoteOnBoard({ title , contentPreview}) {
+export function NoteOnBoard({ title , contentPreview}) {
 
 
 
@@ -12,5 +12,3 @@ function NoteOnBoard({ title , contentPreview}) {
 
   );
 }
-
-export default NoteOnBoard;
