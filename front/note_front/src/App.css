@@ -35,6 +35,12 @@
     z-index: 100;
 }
 
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 .note-on-board {
     width: 200px;
     height: 150px;
@@ -122,6 +128,10 @@ textarea.note-vue-content {
   border-radius: 5px;
 }
 
+.app-container {
+    margin-top: 55px;
+}
+
 .editable {
   background-color: #fff;
   padding: 5px;
@@ -140,3 +150,4 @@ textarea.note-vue-content {
   font-size: 14px;
   margin: 5px 0 0 0;
 }
+
