@@ -1,12 +1,15 @@
-export function NoteOnBoard({ title , contentPreview}) {
+export function NoteOnBoard({ title , contentPreview, onButtonClick , dragHandleProps }) {
 
 
 
   return (
     <>
-        <div class="note-on-board">
-           <p class="note-on-board-title">{title}</p>
-           <p class="note-on-board-contentPreview" >{contentPreview}...</p>
+        <div className="note-on-board">
+            <button className="btn note-on-board-btn" onClick={() => {
+                                                          onButtonClick();
+                                                        }}>Voir</button>
+            <p className="note-on-board-title drag-handle" {...dragHandleProps}>{title}</p>
+            <p className="note-on-board-contentPreview" {...dragHandleProps} >{contentPreview}...</p>
         </div>
     </>
 

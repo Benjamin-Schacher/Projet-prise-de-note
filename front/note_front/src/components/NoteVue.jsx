@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 
-export function NoteVue({ title, creationDate, content }) {
+export function NoteVue({ title, creationDate, content, onClose}) {
   const [isEditing, setIsEditing] = useState(false);
   const [newTitle, setNewTitle] = useState(title);
   const [newContent, setNewContent] = useState(content);
@@ -92,9 +92,13 @@ export function NoteVue({ title, creationDate, content }) {
         </>
       )}
 
-      {isEditing && (
+      {isEditing ? (
         <button className="btn" onClick={handleSubmit}>
           Envoyer
+        </button>
+      ) : (
+        <button className="btn" onClick={onClose}>
+          Fermer
         </button>
       )}
     </div>
