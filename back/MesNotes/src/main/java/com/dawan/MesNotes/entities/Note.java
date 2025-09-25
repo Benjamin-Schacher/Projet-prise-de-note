@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @ToString
 public class Note extends BaseEntity {
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String title;
 
     @Lob
