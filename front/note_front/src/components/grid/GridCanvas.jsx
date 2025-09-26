@@ -1,15 +1,14 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 
 const GridCanvas = ({
   selectedGrid,
-  isResizing,
-  onStartResize,
   cellSize = 30,
+  width = 800,
+  height = 600,
+  onSizeChange = () => {}
 }) => {
-  const gridCols = selectedGrid?.size?.width ? Math.floor(selectedGrid.size.width / cellSize) : 20;
-  const gridRows = selectedGrid?.size?.height ? Math.floor(selectedGrid.size.height / cellSize) : 15;
-  const gridWidth = selectedGrid?.size?.width || 600;
-  const gridHeight = selectedGrid?.size?.height || 400;
+  const gridWidth = width;
+  const gridHeight = height;
 
   // Rendu de la grille
   const renderGrid = useCallback(() => {
@@ -30,28 +29,76 @@ const GridCanvas = ({
       >
         {/* Contenu de la grille ici */}
         
-        {/* Poignée de redimensionnement */}
-        <div
-          className="absolute bottom-0 right-0 w-4 h-4 bg-blue-500 cursor-se-resize"
-          onMouseDown={onStartResize}
-          style={{ cursor: isResizing ? 'se-resize' : 'default' }}
-        />
       </div>
     );
-  }, [gridWidth, gridHeight, cellSize, isResizing, onStartResize]);
+  }, [gridWidth, gridHeight, cellSize]);
 
   return (
-    <div className="flex-1 p-6 overflow-auto">
+    <div className="flex-1 flex flex-col h-full">
       {selectedGrid ? (
-        <div className="flex flex-col items-start">
-          <div className="mb-4">
-            <h2 className="text-xl font-semibold text-white">{selectedGrid.name}</h2>
-            <p className="text-gray-400 text-sm">
-              {gridCols} × {gridRows} cellules
-            </p>
+        <>
+          <div className="p-6 pb-2 bg-gray-900 border-b border-gray-700 fixed left-64 right-0 top-16 h-32 z-10">
+            <h2 className="text-xl font-semibold text-white mb-2">{selectedGrid.name}</h2>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center">
+                <label className="text-white mr-2 text-sm">Largeur:</label>
+                <input 
+                  type="number" 
+                  value={width}
+                  onChange={(e) => {
+                    const newWidth = parseInt(e.target.value) || 100;
+                    if (newWidth >= 100 && newWidth <= 2000) {
+                      onSizeChange({ width: newWidth, height });
+                    }
+                  }}
+                  className="w-20 px-2 py-1 rounded bg-gray-700 text-white text-sm"
+                  min="100"
+                  max="2000"
+                />
+                <span className="ml-1 text-gray-400 text-sm">px</span>
+              </div>
+              <div className="flex items-center">
+                <label className="text-white mr-2 text-sm">Hauteur:</label>
+                <input 
+                  type="number" 
+                  value={height}
+                  onChange={(e) => {
+                    const newHeight = parseInt(e.target.value) || 100;
+                    if (newHeight >= 100 && newHeight <= 2000) {
+                      onSizeChange({ width, height: newHeight });
+                    }
+                  }}
+                  className="w-20 px-2 py-1 rounded bg-gray-700 text-white text-sm"
+                  min="100"
+                  max="2000"
+                />
+                <span className="ml-1 text-gray-400 text-sm">px</span>
+              </div>
+            </div>
           </div>
-          {renderGrid()}
-        </div>
+          <div style={{ 
+            position: 'fixed',
+            top: '12rem',
+            left: '16rem',
+            right: 0,
+            bottom: 0,
+            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1rem'
+          }}>
+            <div style={{
+              maxWidth: '100%',
+              maxHeight: '100%',
+              overflow: 'auto',
+              padding: '1rem',
+              boxSizing: 'border-box'
+            }}>
+              {renderGrid()}
+            </div>
+          </div>
+        </>
       ) : (
         <div className="flex items-center justify-center h-full">
           <p className="text-gray-400">Sélectionnez une grille pour commencer</p>

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Group } from '../grid';
-import Button from '../ui/Button';
 
 const NoteSidebar = ({
   groups,
@@ -28,14 +27,13 @@ const NoteSidebar = ({
     >
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold text-white">Groupes</h2>
-        <Button 
+        <button
           onClick={onAddGroup}
-          size="sm"
-          variant="primary"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
           title="Ajouter un groupe"
         >
           + Groupe
-        </Button>
+        </button>
       </div>
 
       <div className="space-y-4">
