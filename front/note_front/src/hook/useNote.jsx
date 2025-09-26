@@ -33,9 +33,11 @@ export const useNotes = () => {
   };
   const updateNotes = (notes) =>
     handleRequest(api.put, `/notes/${notes.id}`, notes);
+  const createNotes = (notes) => handleRequest(api.post, `/notes`, notes);
 
   return {
     getNotes,
+    createNotes,
     notes,
     error,
     loading,

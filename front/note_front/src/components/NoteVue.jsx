@@ -1,11 +1,18 @@
 import { useState } from "react";
-
+import { useNotes } from "../hook/useNote";
 
 export function NoteVue({ title, creationDate, content, onClose}) {
   const [isEditing, setIsEditing] = useState(false);
   const [newTitle, setNewTitle] = useState(title);
   const [newContent, setNewContent] = useState(content);
-
+  const { getNotes,
+            notes,
+            error,
+            createNotes,
+            loading,
+            getById,
+            getPaginate,
+            updateNotes } = useNotes();
   const [errors, setErrors] = useState({ title: "", content: "" });
 
   const handleSubmit = async (e) => {
@@ -28,11 +35,7 @@ export function NoteVue({ title, creationDate, content, onClose}) {
     if (!valid) return;
 
     try {
-      const response = await fetch("https://xxx", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: newTitle, content: newContent }),
-      });
+      response = updateNotes({ title: newTitle, content: newContent });
 
       if (!response.ok) throw new Error("Erreur lors de l'envoi");
 
