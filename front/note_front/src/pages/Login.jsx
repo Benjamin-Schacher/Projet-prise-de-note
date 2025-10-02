@@ -5,16 +5,64 @@ export const Login = () => {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [loginMessage, setLoginMessage] = useState('');
+    const [isSuccess, setIsSuccess] = useState(false);
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     const isPasswordValid = password.length >= 5;
 
 /* bouton de connexion */
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        //si tout est en ordre
         if (!isEmailValid || !isPasswordValid) return;
-        console.log('Tentative de connexion avec:', email);
-        navigate('/');
+
+        //envoi des données au post dédier
+        try {
+            const response = await fetch('http://localhost:8080/auth/connexion', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                }),
+            });
+
+            // Vérification du type de contenu de la réponse
+            const contentType = response.headers.get('content-type');
+            let data = {};
+            
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            }
+
+            // Gestion des erreurs
+            if (!response.ok) {
+                const errorMessage = data.message || 'Erreur lors de la connexion';
+                throw new Error(errorMessage);
+            }
+
+            // Connexion réussie
+            setIsSuccess(true);
+            setLoginMessage('Connexion réussie ! Redirection en cours...');
+            
+            // Stocker le token ou les informations utilisateur si nécessaire
+            if (data.token) {
+                localStorage.setItem('token', data.token);
+            }
+            
+            // Rediriger vers la page d'accueil après 2 secondes
+            setTimeout(() => {
+                navigate('/');
+            }, 2000);
+            
+        } catch (error) {
+            console.error('Erreur de connexion:', error);
+            setLoginMessage(error.message || 'Erreur lors de la connexion');
+            setIsSuccess(false);
+        }
     };
 
 /* bouton d'inscription */
@@ -28,7 +76,13 @@ export const Login = () => {
 
     return (
         <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border pt-6 px-4 pb-4">
-            <h2 className="text-black text-lg font-bold mb-4 text-center">Login</h2>
+            <h2 className="text-black text-lg font-bold mb-4 text-center">Connexion</h2>
+            
+            {loginMessage && (
+                <div className={`mb-4 p-3 rounded ${isSuccess ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                    {loginMessage}
+                </div>
+            )}
 
 {/* email avec verification si le mail est vide ou invalide et placeholder avec opacity*/}
 

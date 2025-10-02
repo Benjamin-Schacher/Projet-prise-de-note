@@ -11,14 +11,84 @@ export const Subscribe = () => {
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     const isPasswordValid = password.length >= 5;
     const doPasswordsMatch = password === confirmPassword;
+    const [errorMessage, setErrorMessage] = useState('');
+    const [isSuccess, setIsSuccess] = useState(false);
 
 /* bouton d'inscription */
 
-    const subscribe = (e) => {
+    const subscribe = async (e) => {
         e.preventDefault();
-        if (!isEmailValid || !isPasswordValid || !doPasswordsMatch || !prenom || !nom) return;
-        console.log('Tentative d\'inscription avec:', email);
-        navigate('/');
+        setErrorMessage(''); // Réinitialiser les messages d'erreur
+        
+        if (!isEmailValid || !isPasswordValid || !doPasswordsMatch || !prenom || !nom) {
+            setErrorMessage('Veuillez remplir correctement tous les champs');
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:8080/auth/inscription', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: prenom + nom,
+                    email: email,
+                    password: password
+                }),
+            });
+
+            // Gestion de la réponse réussie
+            if (response.ok) {
+                setErrorMessage('Inscription réussie ! Redirection...');
+                setIsSuccess(true);
+                setTimeout(() => {
+                    navigate('/connexion');
+                }, 2000);
+                return;
+            }
+
+            // Gestion des erreurs
+            let errorMessage = 'Une erreur est survenue';
+            
+            try {
+                const contentType = response.headers.get('content-type');
+                let responseData;
+                
+                if (contentType && contentType.includes('application/json')) {
+                    responseData = await response.json();
+                    errorMessage = responseData.message || errorMessage;
+                } else {
+                    const text = await response.text();
+                    try {
+                        // Essayer de parser comme JSON au cas où le content-type serait incorrect
+                        responseData = JSON.parse(text);
+                        errorMessage = responseData.message || errorMessage;
+                    } catch {
+                        // Si ce n'est pas du JSON, utiliser le texte brut
+                        errorMessage = text || errorMessage;
+                    }
+                }
+                
+                // Simplifier les messages d'erreur courants
+                if (errorMessage.includes('déjà pris') || errorMessage.includes('already taken')) {
+                    errorMessage = 'Ce nom d\'utilisateur est déjà pris';
+                } else if (errorMessage.includes('email') && errorMessage.includes('existe')) {
+                    errorMessage = 'Cette adresse email est déjà utilisée';
+                }
+                
+            } catch (error) {
+                console.error('Erreur lors du traitement de la réponse:', error);
+                errorMessage = 'Erreur lors du traitement de la réponse du serveur';
+            }
+            
+            setErrorMessage(errorMessage);
+            setIsSuccess(false);
+        } catch (error) {
+            console.error('Erreur:', error);
+            setErrorMessage('Une erreur est survenue lors de la connexion au serveur');
+            setIsSuccess(false);
+        }
     };
 
 /* bouton de retour au login */
@@ -33,7 +103,20 @@ export const Subscribe = () => {
 //boite de connexion
 
         <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border pt-6 px-4 pb-4">
-            <h2 className="text-black text-lg font-bold mb-4 text-center">Login</h2>
+            <h2 className="text-black text-lg font-bold mb-4 text-center">Inscription</h2>
+
+            {errorMessage && (
+                <div className={`text-sm mb-4 text-center ${isSuccess ? 'text-green-600' : 'text-red-500'}`}>
+                    {isSuccess ? (
+                        <div className="flex items-center justify-center">
+                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            {errorMessage}
+                        </div>
+                    ) : errorMessage}
+                </div>
+            )}
 
 {/*nom avec verification si le nom est vide et placeholder avec opacity*/}
 
