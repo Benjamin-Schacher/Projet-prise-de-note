@@ -25,7 +25,7 @@ export const useNotes = () => {
     }
   };
 
-  const getNotes = () => handleRequest(api.get, "/note");
+  const getNotes = () => handleRequest(api.get, "/note/");
   const getById = (id) => handleRequest(api.get, `/note/${id}`);
   const getByUserId = (id) => handleRequest(api.get, `/note/user/${id}`);
   const getPaginate = (pageIdx = 1, perPage = 10) => {
@@ -34,7 +34,7 @@ export const useNotes = () => {
   };
   const updateNotes = (notes) =>
     handleRequest(api.patch, `/note/${notes.id}`, notes);
-  const createNotes = (notes) => handleRequest(api.post, `/note`, notes);
+  const createNotes = (notes) => handleRequest(api.post, `/note/`, notes);
 
   return {
     getNotes,

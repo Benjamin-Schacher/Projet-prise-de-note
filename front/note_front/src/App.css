@@ -44,6 +44,18 @@ html, body {
     background-color: white;
     border: 1px solid black;
 }
+.creat-note-btn {
+    width: 150px;
+    position: absolute;
+    top: 15%;
+    left: 90%;
+    transform: translate(-50%, -50%);
+}
+.note-btn {
+    color: black;
+    background-color: white;
+    border: 1px solid black;
+}
 .note-on-board-btn {
     background-color: white;
     border: 1px solid black;

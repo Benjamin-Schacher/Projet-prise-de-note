@@ -44,6 +44,10 @@ export const HomePage = () => {
     const [tableNotes, setTableNotes] = useState([]);
     const [user_id, setUser_id] = useState();
     const [selectedNote, setSelectedNote] = useState(null);
+    const [newNoteTitle, setNewNoteTitle] = useState("titre");
+    const [newNoteContent, setNewNoteContent] = useState("contenue");
+
+
 
     const handleDragEnd = (event) => {
       const { active, delta } = event;
@@ -65,7 +69,6 @@ export const HomePage = () => {
         const note = tableNotes.find((n) => n.id === noteId);
         if (note) {
           setSelectedNote(note);
-
         }
     }
 
@@ -124,8 +127,49 @@ export const HomePage = () => {
      );
    };
 
+   const onClickCreateNote = async () => {
+     const width = window.innerWidth;
+     const height = window.innerHeight;
+
+     const userId = sessionStorage.getItem("id_user");
+
+     const newNoteData = {
+       title: newNoteTitle,
+       content: newNoteContent,
+       date: new Date().toISOString(),
+       user: { id: userId },
+     };
+
+     try {
+       const response = await createNotes(newNoteData);
+
+       const createdNote = response.data;
+
+       const noteForFront = {
+         id: createdNote.id.toString(),
+         title: createdNote.title,
+         content: createdNote.content,
+         contentPreview: createdNote.content.substring(0, 50),
+         creationDate: new Date(createdNote.date).toISOString().split("T")[0],
+         position: {
+           x: Math.floor(Math.random() * (width - 2 * 200)) + 200,
+           y: Math.floor(Math.random() * (height - 2 * 200)) + 200,
+         },
+       };
+
+       setTableNotes((prev) => [...prev, noteForFront]);
+       setSelectedNote(noteForFront);
+
+     } catch (err) {
+       console.error("Erreur lors de la création de la note :", err);
+     }
+   };
+
    return (
        <>
+            <button className="creat-note-btn note-btn" onClick={onClickCreateNote}>
+              Crée une note
+            </button>
             <DndContext onDragEnd={handleDragEnd}>
               <div>
                 {tableNotes.map((note) => (
