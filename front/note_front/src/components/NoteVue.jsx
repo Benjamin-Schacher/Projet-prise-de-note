@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNotes } from "../hook/useNote";
 
-export function NoteVue({ title, creationDate, content, onClose}) {
+export function NoteVue({note_id, title, creationDate, content, onClose, onUpdate }) {
   const [isEditing, setIsEditing] = useState(false);
   const [newTitle, setNewTitle] = useState(title);
   const [newContent, setNewContent] = useState(content);
@@ -35,9 +35,19 @@ export function NoteVue({ title, creationDate, content, onClose}) {
     if (!valid) return;
 
     try {
-      response = updateNotes({ title: newTitle, content: newContent });
+      const response = await updateNotes({ id: note_id, title: newTitle, content: newContent });
 
-      if (!response.ok) throw new Error("Erreur lors de l'envoi");
+      if (response.status !== 200) {
+        throw new Error("Erreur lors de l'envoi");
+      } else {
+        setNewTitle(newTitle);
+        setNewContent(newContent);
+      }
+      onUpdate?.({
+        id: note_id,
+        title: newTitle,
+        content: newContent,
+      });
 
       setIsEditing(false);
     } catch (error) {
@@ -52,7 +62,7 @@ export function NoteVue({ title, creationDate, content, onClose}) {
         <div className="note-vue-header-first-chield">
           <p>{creationDate}</p>
           {!isEditing ? (
-            <p className="note-vue-title">{title}</p>
+            <p className="note-vue-title">{newTitle}</p>
           ) : (
             <input
               className={`note-vue-title editable ${errors.title ? "error-field" : ""}`}
@@ -83,7 +93,7 @@ export function NoteVue({ title, creationDate, content, onClose}) {
       </div>
 
       {!isEditing ? (
-        <p className="note-vue-content">{content}</p>
+        <p className="note-vue-content">{newContent}</p>
       ) : (
         <>
           <textarea

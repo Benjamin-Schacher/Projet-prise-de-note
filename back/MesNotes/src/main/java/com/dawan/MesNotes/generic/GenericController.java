@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Field;
+import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -15,7 +17,7 @@ public class GenericController <E, // entity
                                 I, // id
                                 S extends I_GenericService<E, I> // service
                                > {
-    private final S service;
+    protected final S service;
 
     @GetMapping
     public ResponseEntity<Page<E>> all(Pageable pageable) {
@@ -70,15 +72,25 @@ public class GenericController <E, // entity
         }
     }
 
-    @PutMapping
-    public ResponseEntity<E> update(@RequestBody E entity) {
-        try{
-            E updateEntity = service.saveOrUpdate(entity);
-            return ResponseEntity.ok(updateEntity);
-        } catch (DataIntegrityViolationException ex) {
-            return ResponseEntity.badRequest().body(null); // données invalides
-        } catch (Exception ex) { // logguer l'erreur
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // erreur imprévue
+    @PatchMapping("{id}")
+    public ResponseEntity<E> update(@PathVariable I id, @RequestBody Map<String, Object> updates) {
+        Optional<E> existingOpt = service.byId(id);
+        if(existingOpt.isEmpty()){
+            return ResponseEntity.notFound().build();
         }
+
+        E existing = existingOpt.get();
+
+        updates.forEach((field, value) -> {
+            try {
+                Field f = existing.getClass().getDeclaredField(field);
+                f.setAccessible(true);
+                f.set(existing, value);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+            }
+        });
+
+        E updated = service.saveOrUpdate(existing);
+        return ResponseEntity.ok(updated);
     }
 }

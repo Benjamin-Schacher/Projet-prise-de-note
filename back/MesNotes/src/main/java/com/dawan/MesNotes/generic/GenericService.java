@@ -1,10 +1,12 @@
 package com.dawan.MesNotes.generic;
 
+import com.dawan.MesNotes.entities.Note;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -12,7 +14,7 @@ public class GenericService < E, // entity
                               I, // id
                               R extends JpaRepository< E, I> // repository
                             > implements I_GenericService<E, I>{
-    private final R repo;
+    protected final R repo;
 
     @Override
     public Page<E> all(Pageable pageable) {
@@ -33,4 +35,5 @@ public class GenericService < E, // entity
     public E saveOrUpdate(E entity) {
         return repo.save(entity);
     }
+
 }

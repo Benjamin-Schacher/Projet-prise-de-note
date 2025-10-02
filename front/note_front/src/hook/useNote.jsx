@@ -25,21 +25,23 @@ export const useNotes = () => {
     }
   };
 
-  const getNotes = () => handleRequest(api.get, "/notes");
-  const getById = (id) => handleRequest(api.get, `/notes/${id}`);
+  const getNotes = () => handleRequest(api.get, "/note");
+  const getById = (id) => handleRequest(api.get, `/note/${id}`);
+  const getByUserId = (id) => handleRequest(api.get, `/note/user/${id}`);
   const getPaginate = (pageIdx = 1, perPage = 10) => {
-    const url = `/notes/?_page=${pageIdx}&_per_page=${perPage}`;
+    const url = `/note/?_page=${pageIdx}&_per_page=${perPage}`;
     return handleRequest(api.get, url);
   };
   const updateNotes = (notes) =>
-    handleRequest(api.put, `/notes/${notes.id}`, notes);
-  const createNotes = (notes) => handleRequest(api.post, `/notes`, notes);
+    handleRequest(api.patch, `/note/${notes.id}`, notes);
+  const createNotes = (notes) => handleRequest(api.post, `/note`, notes);
 
   return {
     getNotes,
     createNotes,
     notes,
     error,
+    getByUserId,
     loading,
     getById,
     getPaginate,

@@ -26,38 +26,22 @@ export const HomePage = () => {
               contentPreview={contentPreview}
               onButtonClick={() => onClickNoteHandler(id)}
               dragHandleProps={{ ...listeners, ...attributes }}
+
             />
           </div>
         );
       }
 
-    const testNotes = [
-      {
-        id: "1",
-        title: "Note 1",
-        contentPreview: "test 1",
-        content: "This is the full content of Note 1.",
-        creationDate: "2025-09-25",
-        position: { x: 50, y: 50 },
-      },
-      {
-        id: "2",
-        title: "Note 2",
-        contentPreview: "test 2",
-        content: "This is the full content of Note 2.",
-        creationDate: "2025-09-25",
-        position: { x: 300, y: 50 },
-      },
-    ];
     const { getNotes,
             notes,
             error,
             createNotes,
             loading,
+            getByUserId,
             getById,
             getPaginate,
             updateNotes } = useNotes();
-    const [tableNotes, setTableNotes] = useState(testNotes);
+    const [tableNotes, setTableNotes] = useState([]);
     const [user_id, setUser_id] = useState();
     const [selectedNote, setSelectedNote] = useState(null);
 
@@ -86,19 +70,43 @@ export const HomePage = () => {
     }
 
     function getAllNotes(idUser) {
-         getById(idUser).then((resp) => {
-            console.log("resp", resp);
-            setTableNotes(resp.data);
-         });
+      getByUserId(idUser).then((resp) => {
+        const apiNotes = resp.data;
+
+        const tableNotes = apiNotes.map((note) => {
+          const width = window.innerWidth;
+          const height = window.innerHeight;
+
+          return {
+            id: note.id.toString(),
+            title: note.title,
+            content: note.content,
+            contentPreview: note.content.substring(0, 50),
+            creationDate: new Date(note.date).toISOString().split("T")[0],
+            position: {
+              x: Math.floor(Math.random() * (width - 2 * 200)) + 200,
+              y: Math.floor(Math.random() * (height - 2 * 200)) + 200,
+            },
+          };
+        });
+
+        setTableNotes(tableNotes);
+      });
     }
 
-    useEffect(() => {
-       if (sessionStorage.getItem("id_user")) {
-           response = getAllNotes(sessionStorage.getItem("id_user"));
 
-       } else {
-           //avigate("/connexion");
-       }
+    useEffect(() => {
+       const fetchNotes = async () => {
+            const idUser = sessionStorage.getItem("id_user");
+            if (idUser) {
+                await getAllNotes(idUser);
+            } else {
+                navigate("/connexion");
+            }
+       };
+
+       fetchNotes();
+
        document.body.style.backgroundImage = "url('/tableau-liege.jpg')";
        document.body.style.backgroundSize = "cover";
        document.body.style.backgroundPosition = "center";
@@ -111,7 +119,7 @@ export const HomePage = () => {
 
 
    const updatePosition = (id, newPos) => {
-     setNotes((prev) =>
+     setTableNotes((prev) =>
        prev.map((note) => (note.id === id ? { ...note, position: newPos } : note))
      );
    };
@@ -134,10 +142,25 @@ export const HomePage = () => {
 
             {selectedNote && (
                 <NoteVue
+                  note_id={selectedNote.id}
                   title={selectedNote.title}
                   creationDate={selectedNote.creationDate}
                   content={selectedNote.content}
                   onClose={closeNoteModal}
+                  onUpdate={(updatedNote) => {
+                      setTableNotes((prev) =>
+                        prev.map((note) =>
+                          note.id === updatedNote.id
+                            ? {
+                                ...note,
+                                ...updatedNote,
+                                contentPreview: updatedNote.content.substring(0, 50),
+                              }
+                            : note
+                        )
+                      );
+                    }}
+
                 />
             )}
         </>
