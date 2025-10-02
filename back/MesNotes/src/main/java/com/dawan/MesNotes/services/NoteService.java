@@ -11,4 +11,6 @@ public class NoteService extends GenericService<Note, Long, NoteRepository> {
     public NoteService(NoteRepository repo) {
         super(repo);
     }
+
+
 }
