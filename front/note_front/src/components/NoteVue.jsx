@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNotes } from "../hook/useNote";
 
-export function NoteVue({note_id, title, creationDate, content, onClose, onUpdate }) {
+export function NoteVue({note_id, title, creationDate, content, onClose, onUpdate, onDeleteNote}) {
   const [isEditing, setIsEditing] = useState(false);
   const [newTitle, setNewTitle] = useState(title);
   const [newContent, setNewContent] = useState(content);
@@ -11,6 +11,7 @@ export function NoteVue({note_id, title, creationDate, content, onClose, onUpdat
             createNotes,
             loading,
             getById,
+            deleteNote,
             getPaginate,
             updateNotes } = useNotes();
   const [errors, setErrors] = useState({ title: "", content: "" });
@@ -89,6 +90,17 @@ export function NoteVue({note_id, title, creationDate, content, onClose, onUpdat
             >
               {isEditing ? "Annuler" : "Modifier"}
             </button>
+            {!isEditing &&
+                <button
+                  className="btn"
+                  onClick={() => {
+                      onDeleteNote?.(note_id);
+                  }}
+                >
+                  Supprimer
+                </button>
+                }
+
         </div>
       </div>
 

@@ -26,6 +26,7 @@ export const useNotes = () => {
   };
 
   const getNotes = () => handleRequest(api.get, "/note/");
+  const deleteNote = (id) => handleRequest(api.delete, `/note/${id}`);
   const getById = (id) => handleRequest(api.get, `/note/${id}`);
   const getByUserId = (id) => handleRequest(api.get, `/note/user/${id}`);
   const getPaginate = (pageIdx = 1, perPage = 10) => {
@@ -44,6 +45,7 @@ export const useNotes = () => {
     getByUserId,
     loading,
     getById,
+    deleteNote,
     getPaginate,
     updateNotes,
   };

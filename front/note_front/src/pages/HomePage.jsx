@@ -39,6 +39,7 @@ export const HomePage = () => {
             loading,
             getByUserId,
             getById,
+            deleteNote,
             getPaginate,
             updateNotes } = useNotes();
     const [tableNotes, setTableNotes] = useState([]);
@@ -104,7 +105,7 @@ export const HomePage = () => {
             if (idUser) {
                 await getAllNotes(idUser);
             } else {
-                navigate("/connexion");
+                //navigate("/connexion");
             }
        };
 
@@ -127,6 +128,17 @@ export const HomePage = () => {
      );
    };
 
+    const handleDeleteNote = async (noteId) => {
+      try {
+        await deleteNote(noteId);
+        setTableNotes((prev) => prev.filter((note) => note.id !== noteId));
+        setSelectedNote(null);
+      } catch (err) {
+        console.error("Erreur lors de la suppression :", err);
+        alert("Impossible de supprimer la note");
+      }
+    };
+
    const onClickCreateNote = async () => {
      const width = window.innerWidth;
      const height = window.innerHeight;
@@ -137,7 +149,7 @@ export const HomePage = () => {
        title: newNoteTitle,
        content: newNoteContent,
        date: new Date().toISOString(),
-       user: { id: userId },
+       user: { id: 1 },
      };
 
      try {
@@ -191,6 +203,7 @@ export const HomePage = () => {
                   creationDate={selectedNote.creationDate}
                   content={selectedNote.content}
                   onClose={closeNoteModal}
+                  onDeleteNote={handleDeleteNote}
                   onUpdate={(updatedNote) => {
                       setTableNotes((prev) =>
                         prev.map((note) =>
