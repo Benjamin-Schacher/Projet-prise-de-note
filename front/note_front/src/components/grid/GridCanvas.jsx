@@ -1,24 +1,36 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 
 const GridCanvas = ({
   selectedGrid,
   cellSize = 30,
-  width = 800,
+  width = 800,  //taile de base de la grille
   height = 600,
-  onSizeChange = () => {}
+  onSizeChange = ({ width, height }) => {} // fonction de callback pour gérer les changements de taille
 }) => {
-  const gridWidth = width;
-  const gridHeight = height;
+  const [localWidth, setLocalWidth] = useState(width);
+  const [localHeight, setLocalHeight] = useState(height);
 
-  // Rendu de la grille
+  // Mettre à jour les états locaux quand les props changent
+  useEffect(() => {
+    setLocalWidth(width);
+  }, [width]);
+
+  useEffect(() => {
+    setLocalHeight(height);
+  }, [height]);
+  const gridWidth = width; // largeur de la grille
+  const gridHeight = height; // hauteur de la grille
+
+  // Rendu du grillage
   const renderGrid = useCallback(() => {
     return (
       <div 
         className="relative rounded overflow-hidden"
         style={{
-          width: `${gridWidth}px`,
+          width: `${gridWidth}px`, //grillage dynamique en fonction de la taille de la grille
           height: `${gridHeight}px`,
-          backgroundImage: `
+            //style du grillage
+          backgroundImage:  `
             linear-gradient(to right, #e5e7eb 1px, transparent 1px),
             linear-gradient(to bottom, #e5e7eb 1px, transparent 1px)
           `,
@@ -27,12 +39,11 @@ const GridCanvas = ({
           boxShadow: '2px 2px 4px rgba(0,0,0,0.1), -1px -1px 0 rgba(0,0,0,0.05)',
         }}
       >
-        {/* Contenu de la grille ici */}
-        
       </div>
     );
   }, [gridWidth, gridHeight, cellSize]);
 
+  // bloc du haut avec le nom de la grille et les boutons de modification de la taille
   return (
     <div className="flex-1 flex flex-col h-full">
       {selectedGrid ? (
@@ -44,10 +55,28 @@ const GridCanvas = ({
                 <label className="text-white mr-2 text-sm">Largeur:</label>
                 <input 
                   type="number" 
-                  value={width}
+                  value={localWidth}
+                  //gestion de la modification de la taille de la grille min 100 max 2000 pour les deux valeurs
                   onChange={(e) => {
-                    const newWidth = parseInt(e.target.value) || 100;
-                    if (newWidth >= 100 && newWidth <= 2000) {
+                    const value = e.target.value;
+                    setLocalWidth(value);
+                    
+                    if (value === '') return;
+                    
+                    const numValue = Number(value);
+                    if (!isNaN(numValue) && numValue >= 100 && numValue <= 2000) {
+                      onSizeChange({ width: numValue, height });
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const numValue = Number(e.target.value);
+                    if (isNaN(numValue) || numValue < 100) {
+                      const newWidth = 100;
+                      setLocalWidth(newWidth);
+                      onSizeChange({ width: newWidth, height });
+                    } else if (numValue > 2000) {
+                      const newWidth = 2000;
+                      setLocalWidth(newWidth);
                       onSizeChange({ width: newWidth, height });
                     }
                   }}
@@ -61,10 +90,27 @@ const GridCanvas = ({
                 <label className="text-white mr-2 text-sm">Hauteur:</label>
                 <input 
                   type="number" 
-                  value={height}
+                  value={localHeight}
                   onChange={(e) => {
-                    const newHeight = parseInt(e.target.value) || 100;
-                    if (newHeight >= 100 && newHeight <= 2000) {
+                    const value = e.target.value;
+                    setLocalHeight(value);
+                    
+                    if (value === '') return;
+                    
+                    const numValue = Number(value);
+                    if (!isNaN(numValue) && numValue >= 100 && numValue <= 2000) {
+                      onSizeChange({ width, height: numValue });
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const numValue = Number(e.target.value);
+                    if (isNaN(numValue) || numValue < 100) {
+                      const newHeight = 100;
+                      setLocalHeight(newHeight);
+                      onSizeChange({ width, height: newHeight });
+                    } else if (numValue > 2000) {
+                      const newHeight = 2000;
+                      setLocalHeight(newHeight);
                       onSizeChange({ width, height: newHeight });
                     }
                   }}
@@ -76,6 +122,7 @@ const GridCanvas = ({
               </div>
             </div>
           </div>
+            {/* bloc de la grille style*/}
           <div style={{ 
             position: 'fixed',
             top: '12rem',
@@ -88,6 +135,7 @@ const GridCanvas = ({
             justifyContent: 'center',
             padding: '1rem'
           }}>
+              {/*grille style*/}
             <div style={{
               maxWidth: '100%',
               maxHeight: '100%',
@@ -99,10 +147,11 @@ const GridCanvas = ({
             </div>
           </div>
         </>
+          // si pas de grille selectionnée affiche un message
       ) : (
-        <div className="flex items-center justify-center h-full">
-          <p className="text-gray-400">Sélectionnez une grille pour commencer</p>
-        </div>
+          <div className="flex-1 flex items-center justify-center">
+              <p className="text-gray-400">Sélectionnez une grille pour commencer</p>
+          </div>
       )}
     </div>
   );

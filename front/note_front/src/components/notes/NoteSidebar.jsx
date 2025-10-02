@@ -1,6 +1,8 @@
 import React from 'react';
 import { Group } from '../grid';
 
+//grestion du bloc de gauche pour afficher les groupes et les grilles
+
 const NoteSidebar = ({
   groups,
   selectedGrid,

@@ -36,7 +36,7 @@ const Group = ({
     }
   }, [isRenaming]);
 
-  //rendu
+  //rendu des groupes
 
   return (
     <div className="mb-4 bg-gray-800/50 p-3 rounded-lg">
