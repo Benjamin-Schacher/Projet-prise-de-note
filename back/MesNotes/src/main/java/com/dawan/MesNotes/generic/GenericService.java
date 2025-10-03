@@ -12,7 +12,7 @@ public class GenericService < E, // entity
                               I, // id
                               R extends JpaRepository< E, I> // repository
                             > implements I_GenericService<E, I>{
-    private final R repo;
+    protected final R repo;
 
     @Override
     public Page<E> all(Pageable pageable) {

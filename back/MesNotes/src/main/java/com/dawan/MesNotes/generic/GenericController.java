@@ -11,11 +11,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RequiredArgsConstructor
+@SuppressWarnings("unused")
 public class GenericController <E, // entity
                                 I, // id
                                 S extends I_GenericService<E, I> // service
                                > {
-    private final S service;
+    protected final S service;
 
     @GetMapping
     public ResponseEntity<Page<E>> all(Pageable pageable) {
