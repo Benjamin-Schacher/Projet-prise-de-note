@@ -104,31 +104,28 @@ export const HomePage = () => {
 
 	// Récupérer tout les notes du user connecter avec son id
 	function getAllNotes(idUser) {
-		getByUserId(idUser).then((resp) => {
-			//ajout des notes récupérer dans une fonction
-			const apiNotes = resp.data;
+        getByUserId(idUser).then((resp) => {
+            const apiNotes = resp.data.content; // <-- c'est ici que sont tes notes
+            const tableNotes = apiNotes.map((note) => {
+                const width = window.innerWidth;
+                const height = window.innerHeight;
 
-			// création d'un élément pour chaque note avec position alléatoire en fonction de la taille de l'écran
-			const tableNotes = apiNotes.map((note) => {
-				const width = window.innerWidth;
-				const height = window.innerHeight;
+                return {
+                    id: note.id.toString(),
+                    title: note.title,
+                    content: note.content,
+                    contentPreview: note.content.substring(0, 50),
+                    creationDate: new Date(note.date).toISOString().split("T")[0],
+                    position: {
+                        x: Math.floor(Math.random() * (width - 2 * 200)) + 200,
+                        y: Math.floor(Math.random() * (height - 2 * 200)) + 200,
+                    },
+                };
+            });
+            setTableNotes(tableNotes);
+        });
+    }
 
-				return {
-					id: note.id.toString(),
-					title: note.title,
-					content: note.content,
-					contentPreview: note.content.substring(0, 50),
-					creationDate: new Date(note.date).toISOString().split("T")[0],
-					position: {
-						x: Math.floor(Math.random() * (width - 2 * 200)) + 200,
-						y: Math.floor(Math.random() * (height - 2 * 200)) + 200,
-					},
-				};
-			});
-			setTableNotes(tableNotes);
-
-		});
-	}
 
 	// Au début de vie de la page, vérifier si utilisateur connecter et récupérer son id ou le rediriger vers la page de connection
 	useEffect(() => {

@@ -1,24 +1,28 @@
 package com.dawan.MesNotes.entities.heritage;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 @Getter
-@Setter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 @MappedSuperclass
 public class BaseEntity implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private long id;
 
     @Version
+    @ToString.Exclude
     private int version;
 }

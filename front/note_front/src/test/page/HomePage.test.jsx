@@ -41,8 +41,8 @@ describe("HomePage", () => {
     }));
 	const deleteMock = jest.fn(() => Promise.resolve({ status: 200 }));
 	const getByUserIdMock = jest.fn(() =>
-		Promise.resolve({ data: mockNotes })
-	);
+        Promise.resolve({ data: { content: mockNotes } })
+    );
 
 	beforeEach(() => {
 		useNotes.mockReturnValue({

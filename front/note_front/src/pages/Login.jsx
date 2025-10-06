@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hook/useAuth';
 
 export const Login = () => {
     const navigate = useNavigate();
@@ -9,61 +10,27 @@ export const Login = () => {
     const [isSuccess, setIsSuccess] = useState(false);
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     const isPasswordValid = password.length >= 5;
+    const { login, setToken } = useAuth();
 
 /* bouton de connexion */
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        //si tout est en ordre
-        if (!isEmailValid || !isPasswordValid) return;
+    	e.preventDefault();
+    	if (!isEmailValid || !isPasswordValid) return;
 
-        //envoi des données au post dédié
-        try {
-            const response = await fetch('http://localhost:8080/auth/connexion', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email: email,
-                    password: password
-                }),
-            });
+    	try {
+    		await login({ email, password });
+    		setIsSuccess(true);
+    		setLoginMessage('Connexion réussie ! Redirection en cours...');
 
-            // Vérification du type de contenu de la réponse
-            const contentType = response.headers.get('content-type');
-            let data = {};
-            
-            if (contentType && contentType.includes('application/json')) {
-                data = await response.json();
-            }
-
-            // Gestion des erreurs
-            if (!response.ok) {
-                const errorMessage = data.message || 'Erreur lors de la connexion';
-                throw new Error(errorMessage);
-            }
-
-            // Connexion réussie
-            setIsSuccess(true);
-            setLoginMessage('Connexion réussie ! Redirection en cours...');
-            sessionStorage.setItem("id_user", data.user?.id);
-            console.log(data.user?.id);
-            // Stocker le token ou les informations utilisateur si nécessaire
-            if (data.token) {
-                localStorage.setItem('token', data.token);
-            }
-            
-            // Rediriger vers la page d'accueil après 2 secondes
-            setTimeout(() => {
-                navigate('/');
-            }, 2000);
-            
-        } catch (error) {
-            console.error('Erreur de connexion:', error);
-            setLoginMessage(error.message || 'Erreur lors de la connexion');
-            setIsSuccess(false);
-        }
+    		setTimeout(() => {
+    			navigate('/');
+    		}, 1500);
+    	} catch (err) {
+    		console.error('Erreur de connexion:', err);
+    		setIsSuccess(false);
+    		setLoginMessage('Identifiants invalides ou erreur serveur');
+    	}
     };
 
 /* bouton d'inscription */
@@ -89,7 +56,7 @@ export const Login = () => {
 
             <label className="label text-black">Email</label>
             <input 
-                type="email" 
+                type="email"
                 className="input placeholder-gray-400 text-black" 
                 placeholder="Email" 
                 value={email}

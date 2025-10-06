@@ -1,42 +1,55 @@
 import axios from "axios";
 import { useState } from "react";
+import {jwtDecode} from "jwt-decode";
 
 export const useAuth = () => {
-
 	const [error, setError] = useState(null);
 	const [loading, setLoading] = useState(false);
 
-	// Requête qui transmet le temps de loading et les erreurs.
-	const handleRequest = async (requestFunction, ...args) => {
-		setLoading(true);
-		setError(null);
-
-		try {
-			const response = await requestFunction(...args);
-			setLoading(false);
-			return response;
-		} catch (error) {
-			setLoading(false);
-			throw error;
-		}
+	// Stocker et gérer le token
+	const setToken = (token) => {
+		sessionStorage.setItem("token", token);
 	};
 
-	// Lors de la connexion, on utilise login pour requêter le back avec les données de l'utilisateur. Si bon, ajoute l'id/token en sessionStrorage
-	const login = async (credential) => {
-		const response = await handleRequest(
-			(url, data) => api.post(url, data),
-			"/connection",
-			credential
-		);
+	const getToken = () => sessionStorage.getItem("token");
 
-		if (response) {
-			//sessionStorage.setItem("token", response.token); // Pour utiliser le token
-			sessionStorage.setItem("id_user", response.id); // Pour utiliser l'id du connecter
-			return true;
-		} else {
-			throw new Error("Bad credentials");
-		}
+    // Retourne true si un token est présent
+	const isAuthenticated = () => !!getToken();
+
+	// Connexion
+
+    const login = async (credential) => {
+        const response = await axios.post("http://localhost:8080/auth/connexion", credential);
+        const { token } = response.data;
+
+        if (!token) throw new Error("Pas de token reçu");
+
+        setToken(token);
+
+        // 🧩 Décodage du token
+        const decoded = jwtDecode(token);
+        console.log("Token décodé:", decoded);
+
+        // si l'id est présent dans le token
+        if (decoded.id) {
+            sessionStorage.setItem("id_user", decoded.id);
+        }
+
+    };
+
+	// Déconnexion
+	const logout = () => {
+		sessionStorage.removeItem("token");
+		sessionStorage.removeItem("id_user");
 	};
 
-	return { login, error, loading };
+	return {
+		login,
+		logout,
+		error,
+		loading,
+		isAuthenticated,
+		setToken,
+		getToken,
+	};
 };

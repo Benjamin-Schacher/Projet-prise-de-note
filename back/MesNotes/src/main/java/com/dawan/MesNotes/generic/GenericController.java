@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
+@SuppressWarnings("unused")
 public class GenericController <E, // entity
                                 I, // id
                                 S extends I_GenericService<E, I> // service

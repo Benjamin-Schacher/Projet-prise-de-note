@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/")
+@SuppressWarnings("unused")
 public class UserController extends GenericController<User, Long, UserService> {
 
     public UserController(UserService service) {

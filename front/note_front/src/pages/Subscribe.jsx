@@ -50,11 +50,11 @@ export const Subscribe = () => {
 
             // Gestion des erreurs
             let errorMessage = 'Une erreur est survenue';
-            
+
             try {
                 const contentType = response.headers.get('content-type');
                 let responseData;
-                
+
                 if (contentType && contentType.includes('application/json')) {
                     responseData = await response.json();
                     errorMessage = responseData.message || errorMessage;
@@ -69,19 +69,19 @@ export const Subscribe = () => {
                         errorMessage = text || errorMessage;
                     }
                 }
-                
+
                 // Simplifier les messages d'erreur courants
                 if (errorMessage.includes('déjà pris') || errorMessage.includes('already taken')) {
                     errorMessage = 'Ce nom d\'utilisateur est déjà pris';
                 } else if (errorMessage.includes('email') && errorMessage.includes('existe')) {
                     errorMessage = 'Cette adresse email est déjà utilisée';
                 }
-                
+
             } catch (error) {
                 console.error('Erreur lors du traitement de la réponse:', error);
                 errorMessage = 'Erreur lors du traitement de la réponse du serveur';
             }
-            
+
             setErrorMessage(errorMessage);
             setIsSuccess(false);
         } catch (error) {

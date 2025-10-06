@@ -1,12 +1,10 @@
 package com.dawan.MesNotes.generic;
 
-import com.dawan.MesNotes.entities.Note;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -35,5 +33,4 @@ public class GenericService < E, // entity
     public E saveOrUpdate(E entity) {
         return repo.save(entity);
     }
-
 }
