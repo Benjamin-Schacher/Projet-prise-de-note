@@ -17,7 +17,7 @@ export const Login = () => {
         //si tout est en ordre
         if (!isEmailValid || !isPasswordValid) return;
 
-        //envoi des données au post dédier
+        //envoi des données au post dédié
         try {
             const response = await fetch('http://localhost:8080/auth/connexion', {
                 method: 'POST',
@@ -47,7 +47,8 @@ export const Login = () => {
             // Connexion réussie
             setIsSuccess(true);
             setLoginMessage('Connexion réussie ! Redirection en cours...');
-            
+            sessionStorage.setItem("id_user", data.user?.id);
+            console.log(data.user?.id);
             // Stocker le token ou les informations utilisateur si nécessaire
             if (data.token) {
                 localStorage.setItem('token', data.token);

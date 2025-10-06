@@ -35,10 +35,10 @@ public class AuthController {
 
     @PostMapping("/connexion")
     public ResponseEntity<?> showLogin(@Valid @RequestBody User user) {
-        Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
+        Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
 
         if (existingUser.isEmpty()) {
-            return ResponseEntity.badRequest().body("Nom d'utilisateur invalide");
+            return ResponseEntity.badRequest().body("Email invalide");
         }
 
         User foundUser = existingUser.get();
@@ -49,7 +49,8 @@ public class AuthController {
 
         return ResponseEntity.ok(Map.of(
                 "message", "Connexion réussie",
-                "user", foundUser
+                "user", foundUser,
+                "userId", foundUser.getId()
         ));
     }
 
