@@ -38,21 +38,18 @@ export const HomePage = () => {
     	};
 
     	return (
-    		<div ref={setNodeRef} style={outerStyle} {...attributes} {...listeners}>
+    		<div ref={setNodeRef} style={outerStyle}>
     			<div style={innerStyle}>
     				<NoteOnBoard
-    					title={title}
-    					contentPreview={contentPreview}
-    					onButtonClick={() => onClickNoteHandler(id)}
-    				/>
+                    	title={title}
+                    	contentPreview={contentPreview}
+                    	onButtonClick={() => onClickNoteHandler(id)}
+					    dragHandleProps={{ ...listeners, ...attributes }}
+                    />
     			</div>
     		</div>
     	);
     }
-
-
-
-
 
 	const {
 		getNotes,
