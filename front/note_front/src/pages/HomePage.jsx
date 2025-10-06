@@ -11,29 +11,48 @@ export const HomePage = () => {
 
 	//componant d'un élément dragable, utilisant des position en x,y
 	function DraggableNote({ id, title, contentPreview, position }) {
-		const { attributes, listeners, setNodeRef, transform } = useDraggable({ id });
+    	const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id });
 
-		const style = {
-			position: "absolute",
-			left: position.x,
-			top: position.y,
-			transform: transform
-				? `translate3d(${transform.x}px, ${transform.y}px, 0)`
-				: undefined,
-		};
+    	// Wrapper pour la position et le scale
+    	const outerStyle = {
+    		position: "absolute",
+    		left: position.x,
+    		top: position.y,
+    		transform: transform
+    			? `translate3d(${transform.x}px, ${transform.y}px, 0) scale(${isDragging ? 1.1 : 1})`
+    			: isDragging
+    			? "scale(1.1)"
+    			: undefined,
+    		transition: isDragging ? "none" : "transform 0.3s ease",
+    		zIndex: isDragging ? 100 : "auto",
+    	};
 
-		// appelle du components de note sur le tableau
-		return (
-			<div ref={setNodeRef} style={style}>
-				<NoteOnBoard
-					title={title}
-					contentPreview={contentPreview}
-					onButtonClick={() => onClickNoteHandler(id)}
-					dragHandleProps={{ ...listeners, ...attributes }}
-				/>
-			</div>
-		);
-	}
+    	// Inner div pour l'effet de rotation
+    	const innerStyle = {
+    		boxShadow: isDragging
+    			? "0 10px 30px rgba(0,0,0,0.3)"
+    			: "0 5px 10px rgba(0,0,0,0.1)",
+    		display: "inline-block",
+    		transition: isDragging ? "none" : "transform 0.3s ease",
+    		animation: isDragging ? "wiggle-rotate 1s infinite" : "none",
+    	};
+
+    	return (
+    		<div ref={setNodeRef} style={outerStyle} {...attributes} {...listeners}>
+    			<div style={innerStyle}>
+    				<NoteOnBoard
+    					title={title}
+    					contentPreview={contentPreview}
+    					onButtonClick={() => onClickNoteHandler(id)}
+    				/>
+    			</div>
+    		</div>
+    	);
+    }
+
+
+
+
 
 	const {
 		getNotes,
@@ -117,6 +136,7 @@ export const HomePage = () => {
 	// Au début de vie de la page, vérifier si utilisateur connecter et récupérer son id ou le rediriger vers la page de connection
 	useEffect(() => {
 		const fetchNotes = async () => {
+            //sessionStorage.setItem("id_user", 1); pour les test
 			const idUser = sessionStorage.getItem("id_user");
 			if (idUser) {
 				await getAllNotes(idUser);
