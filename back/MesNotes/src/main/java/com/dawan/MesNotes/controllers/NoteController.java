@@ -19,7 +19,7 @@ public class NoteController extends GenericController<Note, Long, NoteService> {
     }
 
     @GetMapping("/mesNotes")
-    public Page<Note> showNotes() {
-        return service.all(Pageable.ofSize(10));
+    public Page<Note> showNotes(Pageable pageable) {
+        return service.all(pageable);
     }
 }

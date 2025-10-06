@@ -30,22 +30,41 @@ public class JwtUtils {
         this.expirationTime = expirationTime;
     }
 
-    public String createToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
+//    public String createToken(UserDetails userDetails) {
+//        Map<String, Object> claims = new HashMap<>();
+//
+//        String authorities= userDetails.getAuthorities()
+//                                                        .stream()
+//                                                        .map(GrantedAuthority::getAuthority)
+//                                                        .collect(Collectors.joining(","));
+//        claims.put("roles", authorities);
+//        return Jwts.builder()
+//                                .claims(claims)
+//                                .subject(((User) userDetails).getEmail())
+//                                .issuedAt(new Date())
+//                                .expiration(new Date((new Date()).getTime() + expirationTime))
+//                                .signWith(getSecretKey(), Jwts.SIG.HS256)
+//                                .compact();
+//    }
+        public String createToken(UserDetails userDetails) {
+            Map<String, Object> claims = new HashMap<>();
 
-        String authorities= userDetails.getAuthorities()
-                                                        .stream()
-                                                        .map(GrantedAuthority::getAuthority)
-                                                        .collect(Collectors.joining(","));
-        claims.put("roles", authorities);
-        return Jwts.builder()
-                                .claims(claims)
-                                .subject(((User) userDetails).getEmail())
-                                .issuedAt(new Date())
-                                .expiration(new Date((new Date()).getTime() + expirationTime))
-                                .signWith(getSecretKey(), Jwts.SIG.HS256)
-                                .compact();
-    }
+            String authorities= userDetails.getAuthorities()
+                    .stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.joining(","));
+            claims.put("roles", authorities);
+
+            claims.put("id", ((User) userDetails).getId());
+
+            return Jwts.builder()
+                    .claims(claims)
+                    .subject(((User) userDetails).getEmail())
+                    .issuedAt(new Date())
+                    .expiration(new Date((new Date()).getTime() + expirationTime))
+                    .signWith(getSecretKey(), Jwts.SIG.HS256)
+                    .compact();
+        }
 
     // Transforme la clé secrète en objet SecretKey utilisable par JJWT
     private SecretKey getSecretKey() {

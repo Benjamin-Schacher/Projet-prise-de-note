@@ -59,9 +59,11 @@ public class AuthController {
         User savedUser = userRepository.save(user);
         UserDTO userDTO = userMapper.userToUserDTO(savedUser);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                Map.of("message", "Inscription réussie", "user", userDTO)
-        );
+        Map<String, Object> model = new HashMap<>();
+        model.put("message", "Inscription réussie");
+        model.put("user", userDTO);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(model);
     }
 
     @PostMapping("/connexion")
