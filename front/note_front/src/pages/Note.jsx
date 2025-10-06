@@ -1,185 +1,104 @@
 import React, { useState, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import { useNavigate } from 'react-router-dom';
 import NoteSidebar from '../components/notes/NoteSidebar';
 import GridCanvas from '../components/grid/GridCanvas';
+import { useNotes } from '../hook/useNote';
+import { DndContext } from '@dnd-kit/core';
+import DraggableNote from '../components/notes/DraggableNote.jsx';
+import { NoteVue } from '../components/NoteVue.jsx';
+import ModalInGrid from '../components/common/ModalInGrid.jsx';
+import { useGrids } from '../hook/useGrids';
+import { useNotes2 } from '../hook/useNotes2';
 
 export const Note = () => {
-    // Taille par défaut pour les nouvelles grilles
-const DEFAULT_GRID_SIZE = { width: 800, height: 600 };
-const [gridSize, setGridSize] = useState(DEFAULT_GRID_SIZE);
-
-    //composant groups avec un id unique et un nom et une liste de grilles + la taille de la grille garder en mémoire
-    const [groups, setGroups] = useState([
-        {
-            id: uuidv4(),
-            name: 'Groupe 1',
-            grids: [
-                { 
-                    id: uuidv4(), 
-                    name: 'Grille 1',
-                    size: { ...DEFAULT_GRID_SIZE }
-                }
-            ]
-        }
-    ]);
-
-    const [selectedGrid, setSelectedGrid] = useState(null);
-
-    // Fonction pour renommer un group
-    const renameGroup = (groupId, newName) => {
-        if (!newName.trim()) return;
-        setGroups(groups.map(group =>
-            group.id === groupId ? { ...group, name: newName } : group
-        ));
-    };
-
-
-    // Mettre à jour la taille de la grille lorsque la grille sélectionnée change
-    useEffect(() => {
-        if (selectedGrid) {
-            setGridSize(selectedGrid.size || DEFAULT_GRID_SIZE);
-        }
-    }, [selectedGrid]);
+    const navigate = useNavigate();
     
-    // Sélectionner la première grille au chargement
-    useEffect(() => {
-        if (groups.length > 0 && groups[0]?.grids?.length > 0 && !selectedGrid) {
-            const firstGrid = groups[0].grids[0];
-            setSelectedGrid(firstGrid);
-        }
-    }, [groups]);
+    // Hook pour gérer les notes
+    const {
+        deleteNote
+    } = useNotes();
+    
+    // Taille par défaut pour les nouvelles grilles
+    const DEFAULT_GRID_SIZE = { width: 800, height: 600 };
+    const {
+        groups,
+        setGroups,
+        selectedGrid,
+        setSelectedGrid,
+        gridSize,
+        renameGroup,
+        addGroup,
+        addGrid,
+        deleteGrid: deleteGridCore,
+        deleteGroup: deleteGroupCore,
+        handleAddFirstGrid,
+        updateGridSize,
+    } = useGrids(DEFAULT_GRID_SIZE);
 
- // Fonction pour ajouter un group
+    // Notes via hook useNotes2
+    const {
+        tableNotes,
+        setTableNotes,
+        selectedNote,
+        setSelectedNote,
+        updateNoteSize,
+        handleDragEnd,
+        handleCreateNote,
+        openNoteById,
+        closeNoteModal,
+        removeNoteGrid,
+    } = useNotes2({ gridSize, selectedGrid, navigate });
 
-    const addGroup = () => {
-        const newGroup = {
-            id: uuidv4(),
-            name: 'Nouveau Groupe',
-            grids: []
-        };
-        setGroups([...groups, newGroup]);
-    };
+    const [newNoteTitle, setNewNoteTitle] = useState('titre');
+    const [newNoteContent, setNewNoteContent] = useState('contenue');
 
-    // Fonction pour supprimer un group
-    const deleteGroup = (groupId) => {
-        // Vérifier si le groupe à supprimer contient la grille actuellement sélectionnée
+    // Suppression groupe avec nettoyage notes (backend + local)
+    const deleteGroup = async (groupId) => {
         const groupToDelete = groups.find(g => g.id === groupId);
-        const isSelectedGridInDeletedGroup = groupToDelete?.grids.some(grid => grid.id === selectedGrid?.id);
-        
-        // Filtrer les groupes pour supprimer celui qui correspond
-        const updatedGroups = groups.filter(group => group.id !== groupId);
-        
-        // Mettre à jour les groupes
-        setGroups(updatedGroups);
-        
-        // Si la grille sélectionnée était dans le groupe supprimé
-        if (isSelectedGridInDeletedGroup) {
-            // Trouver une nouvelle grille à sélectionner dans les groupes restants
-            const firstAvailableGrid = updatedGroups.flatMap(g => g.grids)[0];
-            setSelectedGrid(firstAvailableGrid || null);
-        }
-    };
-
-    // Fonction pour ajouter une grille
-    const addGrid = (groupId) => {
-        const newGrid = {
-            id: uuidv4(),
-            name: `Grille ${groups.find(g => g.id === groupId).grids.length + 1}`,
-            size: { ...DEFAULT_GRID_SIZE }
-        };
-//assigner la nouvelle grille au groupe
-        setGroups(groups.map(group =>
-            group.id === groupId
-                ? { ...group, grids: [...group.grids, newGrid] }
-                : group
-        ));
-
-        setSelectedGrid(newGrid);
-    };
-
-    // Fonction pour supprimer une grille d'un group
-    const deleteGrid = (groupId, gridId) => {
-        setGroups(groups.map(group => {
-            if (group.id === groupId) {
-                const newGrids = group.grids.filter(grid => grid.id !== gridId);
-
-                // Si la grille supprimée est celle qui est actuellement sélectionnée
-                if (selectedGrid && selectedGrid.id === gridId) {
-                    // Trouver une autre grille à sélectionner
-                    const otherGroups = groups.filter(g => g.id !== groupId);
-                    const otherGrids = group.grids.filter(g => g.id !== gridId);
-
-                    if (otherGrids.length > 0) {
-                        // Sélectionner une autre grille du même groupe
-                        setSelectedGrid(otherGrids[0]);
-                    } else if (otherGroups.length > 0 && otherGroups[0].grids.length > 0) {
-                        // Sinon, sélectionner la première grille du premier groupe disponible
-                        setSelectedGrid(otherGroups[0].grids[0]);
-                    } else {
-                        // Sinon, ne plus rien sélectionner
-                        setSelectedGrid(null);
-                    }
-                }
-
-                return { ...group, grids: newGrids };
+        const gridIdsToRemove = (groupToDelete?.grids || []).map(g => g.id);
+        if (gridIdsToRemove.length > 0) {
+            const noteIdsToDelete = tableNotes.filter(n => gridIdsToRemove.includes(n.gridId)).map(n => n.id);
+            if (noteIdsToDelete.length > 0) {
+                try { await Promise.allSettled(noteIdsToDelete.map((nid) => deleteNote(nid))); } catch (e) { console.error('Erreur suppression notes (backend):', e); }
             }
-            return group;
-        }));
-    };
-
-    // ajout grille + group lorsqu'il n'y a rien
-    const handleAddFirstGrid = () => {
-        let targetGroupId;
-        
-        // Si aucun groupe n'existe, on en crée un nouveau
-        if (groups.length === 0) {
-            const newGroup = {
-                id: uuidv4(),
-                name: 'Nouveau Groupe',
-                grids: []
-            };
-            targetGroupId = newGroup.id;
-            setGroups([newGroup]);
-        } else {
-            // Sinon on utilise le premier groupe disponible
-            targetGroupId = groups[0].id;
+            setTableNotes(prev => {
+                const toRemoveIds = new Set(prev.filter(n => gridIdsToRemove.includes(n.gridId)).map(n => n.id));
+                try {
+                    const mapStr = localStorage.getItem('noteGridMap');
+                    const noteGridMap = mapStr ? JSON.parse(mapStr) : {};
+                    for (const nid of toRemoveIds) delete noteGridMap[nid];
+                    localStorage.setItem('noteGridMap', JSON.stringify(noteGridMap));
+                } catch {}
+                if (selectedNote && toRemoveIds.has(selectedNote.id)) setSelectedNote(null);
+                return prev.filter(n => !toRemoveIds.has(n.id));
+            });
         }
-        
-        // Création d'une nouvelle grille dans le groupe cible
-        const newGrid = {
-            id: uuidv4(),
-            name: 'Nouvelle Grille',
-            size: { ...DEFAULT_GRID_SIZE }
-        };
-        
-        setGroups(currentGroups => 
-            currentGroups.map(group => 
-                group.id === targetGroupId
-                    ? { ...group, grids: [...group.grids, newGrid] }
-                    : group
-            )
-        );
-        
-        // Sélection de la nouvelle grille
-        setSelectedGrid(newGrid);
+        deleteGroupCore(groupId);
     };
 
-    const updateGridSize = (newSize) => {
-        if (!selectedGrid) return;
-        
-        setGroups(groups.map(group => ({
-            ...group,
-            grids: group.grids.map(grid => 
-                grid.id === selectedGrid.id 
-                    ? { ...grid, size: { ...grid.size, ...newSize } } 
-                    : grid
-            )
-        })));
-        
-        setGridSize(prevSize => ({
-            ...prevSize,
-            ...newSize
-        }));
+    // Fonction pour supprimer une grille d'un group (et ses notes associées)
+    const deleteGrid = async (groupId, gridId) => {
+        const noteIdsToDelete = tableNotes.filter(n => n.gridId === gridId).map(n => n.id);
+        if (noteIdsToDelete.length > 0) {
+            try { await Promise.allSettled(noteIdsToDelete.map((nid) => deleteNote(nid))); } catch (e) { console.error('Erreur suppression notes (backend):', e); }
+        }
+        setTableNotes(prev => {
+            const toRemoveIds = new Set(prev.filter(n => n.gridId === gridId).map(n => n.id));
+            try {
+                const mapStr = localStorage.getItem('noteGridMap');
+                const noteGridMap = mapStr ? JSON.parse(mapStr) : {};
+                for (const nid of toRemoveIds) delete noteGridMap[nid];
+                localStorage.setItem('noteGridMap', JSON.stringify(noteGridMap));
+            } catch {}
+            if (selectedNote && toRemoveIds.has(selectedNote.id)) setSelectedNote(null);
+            return prev.filter(n => n.gridId !== gridId);
+        });
+        deleteGridCore(groupId, gridId);
+    };
+
+    // Fonction pour créer une nouvelle note
+    const onCreateNote = async () => {
+        await handleCreateNote({ title: newNoteTitle, content: newNoteContent });
     };
 
     if (!selectedGrid) {
@@ -222,7 +141,58 @@ const [gridSize, setGridSize] = useState(DEFAULT_GRID_SIZE);
                         width={gridSize.width}
                         height={gridSize.height}
                         onSizeChange={updateGridSize}
+                        renderActions={() => (
+                            <button
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
+                                onClick={onCreateNote}
+                            >
+                                + Créer une note
+                            </button>
+                        )}
                     />
+                    {/* Zone d'affichage des notes */}
+                    <DndContext onDragEnd={handleDragEnd}>
+                        <div>
+                            {tableNotes
+                                .filter((n) => !selectedGrid || n.gridId === selectedGrid.id)
+                                .map((note) => (
+                                <DraggableNote
+                                    key={note.id}
+                                    id={note.id}
+                                    title={note.title}
+                                    contentPreview={note.contentPreview}
+                                    position={note.position}
+                                    onSize={updateNoteSize}
+                                    onOpen={openNoteById}
+                                />
+                            ))}
+                        </div>
+                    </DndContext>
+                    {selectedNote && (
+                        <ModalInGrid>
+                            <NoteVue
+                                note_id={selectedNote.id}
+                                title={selectedNote.title}
+                                creationDate={selectedNote.creationDate}
+                                content={selectedNote.content}
+                                onClose={closeNoteModal}
+                                onDeleteNote={(noteId) => {
+                                    setTableNotes((prev) => prev.filter((n) => n.id !== noteId));
+                                    setSelectedNote(null);
+                                    removeNoteGrid(noteId);
+                                }}
+                                onUpdate={(updatedNote) => {
+                                    setTableNotes((prev) =>
+                                        prev.map((n) =>
+                                            n.id === updatedNote.id
+                                                ? { ...n, ...updatedNote, contentPreview: updatedNote.content.substring(0, 50) }
+                                                : n
+                                        )
+                                    );
+                                }}
+                            />
+                        </ModalInGrid>
+                    )}
                 </div>
             </div>
         </div>

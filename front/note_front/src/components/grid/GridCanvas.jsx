@@ -5,7 +5,8 @@ const GridCanvas = ({
   cellSize = 30,
   width = 800,  //taile de base de la grille
   height = 600,
-  onSizeChange = ({ width, height }) => {} // fonction de callback pour gérer les changements de taille
+  onSizeChange = ({ width, height }) => {}, // fonction de callback pour gérer les changements de taille
+  renderActions = null, // rendu optionnel d'actions dans l'entête
 }) => {
   const [localWidth, setLocalWidth] = useState(width);
   const [localHeight, setLocalHeight] = useState(height);
@@ -120,6 +121,11 @@ const GridCanvas = ({
                 />
                 <span className="ml-1 text-gray-400 text-sm">px</span>
               </div>
+              {typeof renderActions === 'function' ? (
+                <div className="ml-auto flex items-center space-x-2">
+                  {renderActions()}
+                </div>
+              ) : null}
             </div>
           </div>
             {/* bloc de la grille style*/}
