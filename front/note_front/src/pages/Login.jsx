@@ -9,7 +9,6 @@ export const Login = () => {
     const [loginMessage, setLoginMessage] = useState('');
     const [isSuccess, setIsSuccess] = useState(false);
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    const isPasswordValid = password.length >= 5;
     const { login, setToken } = useAuth();
 
 /* bouton de connexion */
@@ -78,9 +77,6 @@ export const Login = () => {
                 style={{ '--tw-placeholder-opacity': '1', '--tw-text-opacity': '1' }}
                 required
             />
-            {password && password.length < 5 && (
-                <span className="text-red-500 text-xs">Le mot de passe doit contenir au moins 5 caractères</span>
-            )}
 
 {/* bouton de connexion/s'inscrire */}
 

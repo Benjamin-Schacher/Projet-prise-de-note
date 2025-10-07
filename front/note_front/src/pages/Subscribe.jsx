@@ -9,7 +9,7 @@ export const Subscribe = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    const isPasswordValid = password.length >= 5;
+    const isPasswordValid = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^\\w\\s]).{12,}$";
     const doPasswordsMatch = password === confirmPassword;
     const [errorMessage, setErrorMessage] = useState('');
     const [isSuccess, setIsSuccess] = useState(false);
@@ -166,12 +166,13 @@ export const Subscribe = () => {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                minLength="5"
+                minLength="12"
                 style={{ '--tw-placeholder-opacity': '1', '--tw-text-opacity': '1' }}
                 required
             />
-            {password && password.length < 5 && (
-                <span className="text-red-500 text-xs">Le mot de passe doit contenir au moins 5 caractères</span>
+            {password && !password.match(isPasswordValid) && (
+                <span className="text-red-500 text-xs">Le mot de passe doit contenir au moins 12 caractères, 
+                    avec une majuscule, une minuscule, un chiffre et un caractère spécial.</span>
             )}
             <label className="label text-black">Confirmation du mot de passe</label>
 
