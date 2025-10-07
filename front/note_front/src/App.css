@@ -143,10 +143,7 @@ html, body {
   margin: 0;
   padding: 0;
 }
-.popup-vue-note button {
-    background-color: white;
-    border: 1px solid black;
-}
+
 .creat-note-btn {
     height: 40px;
     width: 150px;
