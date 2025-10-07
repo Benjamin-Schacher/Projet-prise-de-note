@@ -10,6 +10,7 @@ export const Login = () => {
     const [isSuccess, setIsSuccess] = useState(false);
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     const { login, setToken } = useAuth();
+    const isPasswordValid = password.length >= 12;
 
 /* bouton de connexion */
 
