@@ -78,7 +78,7 @@ export function NoteVue({ note_id, title, creationDate, content, onClose, onUpda
 
 				<div>
 					<button
-						className="btn"
+						className="btn note-vue-btn"
 						onClick={() => {
 							if (isEditing) {
 								setIsEditing(false);
@@ -95,7 +95,7 @@ export function NoteVue({ note_id, title, creationDate, content, onClose, onUpda
 
 					{!isEditing && (
 						<button
-							className="btn"
+							className="btn note-vue-btn"
 							onClick={() => {
 								onDeleteNote?.(note_id);
 							}}
@@ -120,11 +120,11 @@ export function NoteVue({ note_id, title, creationDate, content, onClose, onUpda
 			)}
 
 			{isEditing ? (
-				<button className="btn" onClick={handleSubmit}>
+				<button className="btn note-vue-btn" onClick={handleSubmit}>
 					Envoyer
 				</button>
 			) : (
-				<button className="btn" onClick={onClose}>
+				<button className="btn note-vue-btn" onClick={onClose}>
 					Fermer
 				</button>
 			)}

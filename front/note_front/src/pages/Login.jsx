@@ -11,6 +11,7 @@ export const Login = () => {
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     const isPasswordValid = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^\\w\\s]).{12,}$";
     const { login, setToken } = useAuth();
+    const isPasswordValid = password.length >= 12;
 
 /* bouton de connexion */
 
