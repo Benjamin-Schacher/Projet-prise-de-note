@@ -139,7 +139,6 @@
 }
 
 html, body {
-  height: 100%;
   margin: 0;
   padding: 0;
 }
@@ -328,4 +327,25 @@ textarea.note-vue-content {
   border: none;
   font-size: 1rem;
   cursor: pointer;
+}
+
+
+/* Form */
+fieldset{
+  border: none;
+  padding: 5em;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;;
+  h2{
+    font-size: 2rem;
+  }
+  label{
+    font-size: 1rem;
+    font-weight: bold;
+    margin: auto 2.5em;
+  }
+  input{
+    border-radius: none;
+    margin: auto;
+    box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+  }
 }

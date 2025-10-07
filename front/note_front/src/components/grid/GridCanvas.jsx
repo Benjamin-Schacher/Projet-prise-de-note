@@ -48,7 +48,7 @@ const GridCanvas = ({
     <div className="flex-1 flex flex-col h-full">
       {selectedGrid ? (
         <>
-          <div className="p-6 pb-2 bg-gray-900 border-b border-gray-700 fixed left-64 right-0 top-16 h-32 z-10">
+          <div className="p-6 pb-2 bg-gray-900 border-b border-gray-700 fixed left-64 right-0 top-0 h-32 z-10 ">
             <h2 className="text-xl font-semibold text-white mb-2">{selectedGrid.name}</h2>
             <div className="flex items-center space-x-4">
               <div className="flex items-center">

@@ -21,10 +21,11 @@ const NoteSidebar = ({
       className="bg-gray-900 text-white p-4 border-r border-gray-700 overflow-y-auto" 
       style={{ 
         width: sidebarWidth,
-        height: 'calc(100vh - 4rem)',
+        height: 'calc(100vh)',
         position: 'fixed',
         left: 0,
-        top: '4rem'
+        top: 0,
+        paddingTop: '6em'
       }}
     >
       <div className="flex justify-between items-center mb-4">

@@ -41,7 +41,7 @@ export const Navbar = () => {
 									Déconnexion
 								</button>
 							) : (
-								<HeaderItem href="/connexion">Login</HeaderItem>
+								<HeaderItem href="/connexion">Connexion</HeaderItem>
 							)}
 						</li>
 					</ul>

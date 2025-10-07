@@ -72,7 +72,7 @@ export const Subscribe = () => {
 
                 // Simplifier les messages d'erreur courants
                 if (errorMessage.includes('déjà pris') || errorMessage.includes('already taken')) {
-                    errorMessage = 'Ce nom d\'utilisateur est déjà pris';
+                    errorMessage = 'Ce nom d\'utilisateur est déjà pris.';
                 } else if (errorMessage.includes('email') && errorMessage.includes('existe')) {
                     errorMessage = 'Cette adresse email est déjà utilisée';
                 }
@@ -100,9 +100,8 @@ export const Subscribe = () => {
 
     return (
 
-//boite de connexion
-
-        <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border pt-6 px-4 pb-4">
+    //boite de connexion
+         <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-lg border pt-6 px-4 pb-4">
             <h2 className="text-black text-lg font-bold mb-4 text-center">Inscription</h2>
 
             {errorMessage && (
@@ -124,7 +123,7 @@ export const Subscribe = () => {
             <input
                 type="text"
                 className="input placeholder-gray-400 text-black"
-                placeholder="Nom"
+                //placeholder="Nom"
                 value={nom}
                 onChange={(e) => setNom(e.target.value)}
                 style={{ '--tw-placeholder-opacity': '1', '--tw-text-opacity': '1' }}
@@ -133,11 +132,11 @@ export const Subscribe = () => {
 
 {/*prenom avec verification si le prenom est vide et placeholder avec opacity*/}
 
-            <label className="label text-black">Prenom</label>
+            <label className="label text-black">Prénom</label>
             <input
                 type="text"
                 className="input placeholder-gray-400 text-black"
-                placeholder="Prenom"
+                //placeholder="Prénom"
                 value={prenom}
                 onChange={(e) => setPrenom(e.target.value)}
                 style={{ '--tw-placeholder-opacity': '1', '--tw-text-opacity': '1' }}
@@ -150,7 +149,7 @@ export const Subscribe = () => {
             <input
                 type="email"
                 className="input placeholder-gray-400 text-black"
-                placeholder="Email"
+                //placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 style={{ '--tw-placeholder-opacity': '1', '--tw-text-opacity': '1' }}
@@ -159,11 +158,11 @@ export const Subscribe = () => {
 
 {/*mot de passe avec verification si le mot de passe est vide ou trop court et placeholder avec opacity*/}
 
-            <label className="label text-black">Password</label>
+            <label className="label text-black">Mot de passe</label>
             <input
                 type="password"
                 className="input placeholder-gray-400 text-black"
-                placeholder="Password"
+                //placeholder="Mot de passe"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 minLength="12"
@@ -181,7 +180,7 @@ export const Subscribe = () => {
             <input
                 type="password"
                 className="input placeholder-gray-400 text-black"
-                placeholder="Confirmez le mot de passe"
+                //placeholder="Confirmez le mot de passe"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 minLength="5"
@@ -189,7 +188,7 @@ export const Subscribe = () => {
                 required
             />
             {confirmPassword && !doPasswordsMatch && (
-                <span className="text-red-500 text-xs">Les mots de passe ne correspondent pas</span>
+                <span className="text-red-500 text-xs">Les mots de passe ne correspondent pas...</span>
             )}
 
 {/* bouton de retour au login et de s'inscrire avec test des conditions precedents*/}
@@ -199,7 +198,7 @@ export const Subscribe = () => {
                     className="btn btn-outline flex-1"
                     onClick={handleSubmit}
                 >
-                    retour au login
+                    Connexion
                 </button>
                 <button
                     className={`btn flex-1 ${(isEmailValid && isPasswordValid && doPasswordsMatch && nom && prenom) ? 'btn-neutral' : 'btn-disabled'}`}
@@ -209,6 +208,6 @@ export const Subscribe = () => {
                     S'inscrire
                 </button>
             </div>
-        </fieldset>
+        </fieldset> 
     );
 };
