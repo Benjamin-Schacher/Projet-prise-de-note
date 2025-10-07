@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:5173")
 @SuppressWarnings("unused")
 @Slf4j
 public class AuthController {

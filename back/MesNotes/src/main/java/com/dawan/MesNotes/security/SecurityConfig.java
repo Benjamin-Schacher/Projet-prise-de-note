@@ -22,6 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@SuppressWarnings("unused")
 public class SecurityConfig {
 
     private final JwtAccessDeniedHandler accessDeniedHandler;
@@ -47,8 +48,7 @@ public class SecurityConfig {
         return http
                     .csrf(AbstractHttpConfigurer::disable)
                     .authorizeHttpRequests(auth ->
-                            auth.requestMatchers(HttpMethod.GET, "/note/mesNotes",
-                                                                "/user").authenticated()
+                            auth.requestMatchers(HttpMethod.GET, "/note/**").authenticated()
                                     .anyRequest().permitAll()
                     )
                     // accessDeniedHandler → quand un utilisateur connecté tente d’accéder à une ressource pour laquelle il n’a pas le droit.
