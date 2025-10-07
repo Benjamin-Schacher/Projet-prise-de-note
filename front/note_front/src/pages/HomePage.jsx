@@ -23,7 +23,7 @@ export const HomePage = () => {
                 : isDragging
                 ? "scale(1.1)"
                 : undefined,
-            transition: isDragging ? "none" : "transform 0.3s ease",
+            transition: isDragging ? "none" : "left 0.3s ease, top 0.3s ease, transform 0.3s ease",
             zIndex: zIndex, // <-- appliquer le zIndex
         };
 
@@ -32,7 +32,7 @@ export const HomePage = () => {
                 ? "0 10px 30px rgba(0,0,0,0.3)"
                 : "0 5px 10px rgba(0,0,0,0.1)",
             display: "inline-block",
-            transition: isDragging ? "none" : "transform 0.3s ease",
+            transition: isDragging ? "none" : "transform 0.3s ease, box-shadow 0.3s ease",
             animation: isDragging ? "wiggle-rotate 1s infinite" : "none",
         };
 
@@ -158,6 +158,7 @@ export const HomePage = () => {
 		document.body.style.backgroundImage = "url('/tableau-liege.jpg')";
 		document.body.style.backgroundSize = "cover";
 		document.body.style.backgroundPosition = "center";
+        document.body.style.backgroundAttachment = "fixed";
 
 		return () => {
 			//nétoyage quand on quitte la page
@@ -183,6 +184,33 @@ export const HomePage = () => {
 			alert("Impossible de supprimer la note");
 		}
 	};
+
+    // Fonction pour trier et aligner les notes en grille
+    const handleSortNotes = () => {
+        const noteWidth = 200;
+        const noteHeight = 200;
+        const margin = 20;
+        const maxColumns = Math.floor(window.innerWidth / (noteWidth + margin));
+        const gridWidth = maxColumns * (noteWidth + margin) - margin;
+        const startX = (window.innerWidth - gridWidth) / 2;
+        const startY = 100;
+
+        const sortedNotes = tableNotes.map((note, index) => {
+            const row = Math.floor(index / maxColumns);
+            const col = index % maxColumns;
+            const newX = startX + col * (noteWidth + margin);
+            const newY = startY + row * (noteHeight + margin);
+
+            return {
+                ...note,
+                position: { x: newX, y: newY },
+                zIndex: 10,
+            };
+        });
+
+        setTableNotes(sortedNotes);
+        setMaxZIndex(10);
+    };
 
 	// gestion de la création d'une note avec requete a l'api et mise a jour du "dachboard"
 	const onClickCreateNote = async () => {
@@ -229,9 +257,15 @@ export const HomePage = () => {
 
 	return (
 		<>
-			<button className="creat-note-btn note-btn" onClick={onClickCreateNote}>
-				Crée une note
-			</button>
+		    <div className="background-note"></div>
+		    <div className="note-action">
+                <button className="creat-note-btn note-btn" onClick={onClickCreateNote}>
+                    Crée une note
+                </button>
+                <button className="creat-note-btn note-btn" onClick={handleSortNotes}>
+                    Trié les notes
+                </button>
+			</div>
 			<DndContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
                 <div>
                     {tableNotes.map((note) => (
