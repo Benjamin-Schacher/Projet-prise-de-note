@@ -7,48 +7,47 @@ import { useNavigate } from "react-router-dom";
 
 export const HomePage = () => {
 	const navigate = useNavigate();
+    const [maxZIndex, setMaxZIndex] = useState(10);
 
 
 	//componant d'un élément dragable, utilisant des position en x,y
-	function DraggableNote({ id, title, contentPreview, position }) {
-    	const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id });
+	function DraggableNote({ id, title, contentPreview, position, zIndex }) {
+        const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id });
 
-    	// Wrapper pour la position et le scale
-    	const outerStyle = {
-    		position: "absolute",
-    		left: position.x,
-    		top: position.y,
-    		transform: transform
-    			? `translate3d(${transform.x}px, ${transform.y}px, 0) scale(${isDragging ? 1.1 : 1})`
-    			: isDragging
-    			? "scale(1.1)"
-    			: undefined,
-    		transition: isDragging ? "none" : "transform 0.3s ease",
-    		zIndex: isDragging ? 100 : "auto",
-    	};
+        const outerStyle = {
+            position: "absolute",
+            left: position.x,
+            top: position.y,
+            transform: transform
+                ? `translate3d(${transform.x}px, ${transform.y}px, 0) scale(${isDragging ? 1.1 : 1})`
+                : isDragging
+                ? "scale(1.1)"
+                : undefined,
+            transition: isDragging ? "none" : "transform 0.3s ease",
+            zIndex: zIndex, // <-- appliquer le zIndex
+        };
 
-    	// Inner div pour l'effet de rotation
-    	const innerStyle = {
-    		boxShadow: isDragging
-    			? "0 10px 30px rgba(0,0,0,0.3)"
-    			: "0 5px 10px rgba(0,0,0,0.1)",
-    		display: "inline-block",
-    		transition: isDragging ? "none" : "transform 0.3s ease",
-    		animation: isDragging ? "wiggle-rotate 1s infinite" : "none",
-    	};
+        const innerStyle = {
+            boxShadow: isDragging
+                ? "0 10px 30px rgba(0,0,0,0.3)"
+                : "0 5px 10px rgba(0,0,0,0.1)",
+            display: "inline-block",
+            transition: isDragging ? "none" : "transform 0.3s ease",
+            animation: isDragging ? "wiggle-rotate 1s infinite" : "none",
+        };
 
-    	return (
-    		<div ref={setNodeRef} style={outerStyle}>
-    			<div style={innerStyle}>
-    				<NoteOnBoard
-                    	title={title}
-                    	contentPreview={contentPreview}
-                    	onButtonClick={() => onClickNoteHandler(id)}
-					    dragHandleProps={{ ...listeners, ...attributes }}
+        return (
+            <div ref={setNodeRef} style={outerStyle}>
+                <div style={innerStyle}>
+                    <NoteOnBoard
+                        title={title}
+                        contentPreview={contentPreview}
+                        onButtonClick={() => onClickNoteHandler(id)}
+                        dragHandleProps={{ ...listeners, ...attributes }}
                     />
-    			</div>
-    		</div>
-    	);
+                </div>
+            </div>
+        );
     }
 
 	const {
@@ -70,6 +69,19 @@ export const HomePage = () => {
 	const [newNoteTitle, setNewNoteTitle] = useState("titre");
 	const [newNoteContent, setNewNoteContent] = useState("contenue");
 
+	// Ecouteur d'évenement de début de drague pour augmenter le zindex
+    const handleDragStart = (event) => {
+        const { active } = event;
+        // Incrémente le zIndex max
+        setTableNotes(prev =>
+            prev.map(note =>
+                note.id === active.id
+                    ? { ...note, zIndex: maxZIndex + 1 }
+                    : note
+            )
+        );
+        setMaxZIndex(prev => prev + 1);
+    };
 	// Ecouteur d'évenement de lacher d'un élément dragable, mise a jour de la posion x, y de la note
 	const handleDragEnd = (event) => {
 		const { active, delta } = event;
@@ -220,19 +232,20 @@ export const HomePage = () => {
 			<button className="creat-note-btn note-btn" onClick={onClickCreateNote}>
 				Crée une note
 			</button>
-			<DndContext onDragEnd={handleDragEnd}>
-				<div>
-					{tableNotes.map((note) => (
-						<DraggableNote
-							key={note.id}
-							id={note.id}
-							title={note.title}
-							contentPreview={note.contentPreview}
-							position={note.position}
-						/>
-					))}
-				</div>
-			</DndContext>
+			<DndContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
+                <div>
+                    {tableNotes.map((note) => (
+                        <DraggableNote
+                            key={note.id}
+                            id={note.id}
+                            title={note.title}
+                            contentPreview={note.contentPreview}
+                            position={note.position}
+                            zIndex={note.zIndex || 10}
+                        />
+                    ))}
+                </div>
+            </DndContext>
 
 			{selectedNote && (
 				<NoteVue

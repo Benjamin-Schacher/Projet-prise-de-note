@@ -194,7 +194,17 @@ html, body {
     border-left: 30px solid rgba(0,0,0,0.2);
     pointer-events: none;
 }
-
+.popup-vue-note::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-bottom: 30px solid transparent;
+    border-left: 30px solid rgba(0,0,0,0.2);
+    pointer-events: none;
+}
 
 .note-on-board-title {
     padding-right: 10px;
@@ -222,6 +232,7 @@ html, body {
     padding: 15px;
     background-color: yellow;
     box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    z-index: 1000000000000000000;
 }
 
 .note-vue-header {
