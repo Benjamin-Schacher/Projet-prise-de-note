@@ -25,6 +25,7 @@ export function useNotes2({ gridSize, selectedGrid, navigate }) {
                 const res = await getByUserId(userId);
                 const apiNotes = Array.isArray(res.data) ? res.data : Array.isArray(res) ? res : [];
 
+                // 1️⃣ On stocke les positions brutes du back
                 const mapped = apiNotes.map((note) => ({
                     id: note.id.toString(),
                     title: note.title,
@@ -32,9 +33,13 @@ export function useNotes2({ gridSize, selectedGrid, navigate }) {
                     contentPreview: (note.content || "").substring(0, 50),
                     creationDate: new Date(note.date).toISOString().split("T")[0],
                     gridId: note.grid_id ?? null,
-                    position: { x: note.pos_x ?? 0, y: note.pos_y ?? 0 },
+                    position: {
+                        x: note.pos_x ?? 0,
+                        y: note.pos_y ?? 0
+                    }
                 }));
 
+                console.log("🧭 Notes reçues :", mapped);
                 setTableNotes(mapped);
             } catch (err) {
                 console.error("❌ Erreur lors de la récupération des notes :", err);
@@ -42,7 +47,8 @@ export function useNotes2({ gridSize, selectedGrid, navigate }) {
         };
 
         fetchUserNotes();
-    }, [getByUserId, navigate, gridSize]);
+    }, [getByUserId, navigate]);
+
 
     // --- Recalcul position notes si la grille change
     useEffect(() => {
@@ -138,8 +144,19 @@ export function useNotes2({ gridSize, selectedGrid, navigate }) {
             prev.map((n) => (n.id === id ? { ...n, position: newPos } : n))
         );
 
-        handleUpdateNote({ ...note, pos_x: newPos.x, pos_y: newPos.y }).catch(() => {});
+        handleUpdateNote({ ...note, pos_x: newPos.x, pos_y: newPos.y })
+            .then(updated => {
+                setTableNotes(prev =>
+                    prev.map(n =>
+                        n.id === updated.id
+                            ? { ...n, position: { x: updated.pos_x, y: updated.pos_y } } // <-- ici aussi
+                            : n
+                    )
+                );
+            })
+            .catch(() => {});
     };
+
 
     const openNoteById = (id) => {
         const note = tableNotes.find((n) => n.id === id);

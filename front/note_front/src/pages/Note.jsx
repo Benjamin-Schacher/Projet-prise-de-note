@@ -128,14 +128,31 @@ export const Note = () => {
                                 creationDate={selectedNote.creationDate}
                                 onClose={closeNoteModal}
                                 onUpdate={async (updatedNote) => {
-                                    await handleUpdateNote({
+                                    // on retrouve la note actuelle dans le tableau
+                                    const currentNote = tableNotes.find(n => n.id === updatedNote.id);
+
+                                    // si la position n’est pas envoyée, on garde l’ancienne
+                                    const safePosition = updatedNote.position || currentNote?.position || { x: 0, y: 0 };
+
+                                    const finalNote = {
                                         ...updatedNote,
-                                        pos_x: updatedNote.position?.x ?? 0,
-                                        pos_y: updatedNote.position?.y ?? 0
-                                    });
+                                        pos_x: safePosition.x,
+                                        pos_y: safePosition.y
+                                    };
+
+                                    await handleUpdateNote(finalNote);
 
                                     setTableNotes(prev =>
-                                        prev.map(n => n.id === updatedNote.id ? { ...n, ...updatedNote } : n)
+                                        prev.map(n =>
+                                            n.id === updatedNote.id
+                                                ? {
+                                                    ...n,
+                                                    ...updatedNote,
+                                                    position: safePosition, // 🔽 garde la position actuelle
+                                                    contentPreview: (updatedNote.content || "").substring(0, 50)
+                                                }
+                                                : n
+                                        )
                                     );
                                 }}
                                 onDeleteNote={handleDeleteNote} // <-- passe la fonction
