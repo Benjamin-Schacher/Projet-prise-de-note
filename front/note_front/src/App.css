@@ -1,7 +1,6 @@
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
 }
 
@@ -85,7 +84,7 @@
 }
 
 .navbar-container nav ul li {
-	margin: 30px 0;
+	margin: 17px 0;
 }
 
 .nav-btn {
@@ -144,6 +143,7 @@ html, body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+  overflow-y: auto;
 }
 .background-note {
     top: 0px;
@@ -156,6 +156,7 @@ html, body {
     background-position: center;
     background-attachment: fixed;
 }
+
 .note-action {
     position: absolute;
     top: 10px;
@@ -346,9 +347,6 @@ textarea.note-vue-content {
   border-radius: 5px;
 }
 
-.app-container {
-    margin-top: 55px;
-}
 
 .editable {
   background-color: #fff;
@@ -420,4 +418,103 @@ fieldset{
     margin: auto;
     box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
   }
+}
+
+
+/* page event */
+.background-event {
+    top: 0px;
+}
+.calendar-container {
+  color: #fff; /* Texte blanc pour contraste */
+  background-color: transparent; /* Fond transparent pour voir le fond noir */
+      margin-top: -148px;
+}
+
+.calendar-container h2 {
+  color: #fff;
+}
+
+.calendar-container form {
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.calendar-container label {
+  color: #fff;
+  margin-right: 10px;
+}
+
+.calendar-container input,
+.calendar-container textarea {
+  background-color: #333; /* Fond sombre pour les champs */
+  color: #fff; /* Texte blanc */
+  border: 1px solid #fff;
+  border-radius: 4px;
+  padding: 8px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.calendar-container button {
+  background-color: grey;
+  color: #000;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.calendar-container button:hover {
+  background-color: #ccc;
+}
+
+.rbc-calendar {
+  background-color: transparent; /* Fond transparent pour le calendrier */
+  padding-bottom: 50px;
+}
+
+.rbc-toolbar {
+  background-color: #222; /* Fond sombre pour la barre d'outils */
+}
+
+.rbc-toolbar-label,
+.rbc-btn-group button {
+  color: #fff !important; /* Boutons et texte blanc */
+}
+
+.rbc-btn-group button:hover {
+  background-color: #444 !important;
+}
+
+.rbc-event {
+  background-color: #3174ad !important; /* Couleur des événements */
+  color: #fff !important;
+}
+
+.rbc-selected {
+  background-color: #555 !important; /* Cellules sélectionnées */
+}
+
+.rbc-month-view,
+.rbc-time-view {
+  border: 1px solid #fff; /* Bordures blanches */
+}
+
+.rbc-header,
+.rbc-day-bg,
+.rbc-time-slot {
+  border-color: #fff !important; /* Bordures blanches */
+}
+
+.rbc-time-header,
+.rbc-time-content {
+  color: #fff !important;
+}
+
+.rbc-agenda-view table,
+.rbc-agenda-view th,
+.rbc-agenda-view td {
+  color: #fff !important;
+  border-color: #fff !important;
 }

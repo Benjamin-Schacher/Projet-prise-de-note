@@ -154,15 +154,7 @@ export const HomePage = () => {
 		// appel de la fonction pour récupérer les notes de l'utilisateur
 		fetchNotes();
 
-		// application du fond en liège; todo -> le faire proprement
-		document.body.style.backgroundImage = "url('/tableau-liege.jpg')";
-		document.body.style.backgroundSize = "cover";
-		document.body.style.backgroundPosition = "center";
-        document.body.style.backgroundAttachment = "fixed";
-
 		return () => {
-			//nétoyage quand on quitte la page
-			document.body.style.backgroundImage = "";
 		};
 	}, [navigate]);
 

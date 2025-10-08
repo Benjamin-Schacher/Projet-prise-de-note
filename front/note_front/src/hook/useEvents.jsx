@@ -31,14 +31,14 @@ export const useEvents = () => {
 	const getEvents = () => handleRequest(api.get, "/event/");
 	const deleteEvent = (id) => handleRequest(api.delete, `/event/${id}`);
 	const getById = (id) => handleRequest(api.get, `/event/${id}`);
-	const getByUserId = (id) => handleRequest(api.get, `/event/mesEvents`);
+	const getByUserId = () => handleRequest(api.get, `/event/mesEvent`);
 	const getPaginate = (pageIdx = 1, perPage = 10) => {
 		const url = `/event/?_page=${pageIdx}&_per_page=${perPage}`;
 		return handleRequest(api.get, url);
 	};
-	const updateEvent = (event) => handleRequest(api.patch, `/event/${Events.id}`, event);
+	const updateEvent = (event) => handleRequest(api.patch, `/event/${event.id}`, event);
 	const createEvent = (event) => handleRequest(api.post, `/event/`, event);
-    const getEventsByDate = (startDate) => handleRequest(api.get, `/event/searchAfterDate`, startDate);
+    const getEventsByDate = (startDate) => handleRequest(api.get, `/event/searchAfterDate?startDate=${startDate}`);
 
 	return {
 		getEvents,
