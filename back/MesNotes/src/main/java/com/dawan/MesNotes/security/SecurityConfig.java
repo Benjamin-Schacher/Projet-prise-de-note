@@ -48,6 +48,7 @@ public class SecurityConfig {
                     .csrf(AbstractHttpConfigurer::disable)
                     .authorizeHttpRequests(auth ->
                             auth.requestMatchers(HttpMethod.GET, "/note/mesNotes",
+                                                                "/event/**",
                                                                 "/user").authenticated()
                                     .anyRequest().permitAll()
                     )
