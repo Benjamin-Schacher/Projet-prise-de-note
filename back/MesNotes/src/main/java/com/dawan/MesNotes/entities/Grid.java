@@ -1,11 +1,13 @@
 package com.dawan.MesNotes.entities;
 
 import com.dawan.MesNotes.entities.heritage.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -23,8 +25,13 @@ public class Grid extends BaseEntity {
     @Column(nullable = false)
     private String grid_name;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "id_groups", nullable = false)
-    private groups groups;
+    @ManyToOne
+    @JoinColumn(name = "group_id")
+    @JsonBackReference
+    private groups groups; // doit correspondre à mappedBy
+
+    @OneToMany(mappedBy = "grid", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference // sérialisation "parent"
+    private List<Note> notes = new ArrayList<>();
 
 }

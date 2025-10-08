@@ -11,6 +11,7 @@ const Group = ({
   selectedGrid, 
   onAddGrid, 
   onDeleteGrid,
+  onRenameGrid,
   groups,
   setGroups,
   setSelectedGrid
@@ -18,6 +19,7 @@ const Group = ({
     // gère le renommage du groupe et le focus sur l'input
   const [isRenaming, setIsRenaming] = useState(false);
   const [newName, setNewName] = useState(group.name);
+  const [addingDisabled, setAddingDisabled] = useState(false);
   const inputRef = useRef(null);
 // gère la confirmation du renommage
   const handleRename = () => {
@@ -61,8 +63,15 @@ const Group = ({
           {/* boutons d'actions suprimer et ajouter une grille */}
         <div className="flex space-x-2">
           <button
-            onClick={() => onAddGrid(group.id)}
-            className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded"
+            onClick={() => {
+              if (addingDisabled) return;
+              setAddingDisabled(true);
+              onAddGrid(group.id);
+              // brief debounce to avoid duplicate first click
+              setTimeout(() => setAddingDisabled(false), 600);
+            }}
+            disabled={addingDisabled}
+            className={`text-xs px-2 py-1 rounded ${addingDisabled ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
             title="Ajouter une grille"
           >
             + Grille
@@ -91,17 +100,7 @@ const Group = ({
             onSelect={() => onSelect(grid, group.id)}
             onDelete={() => onDeleteGrid(group.id, grid.id)}
             onRename={(newName) => {
-              const updatedGroups = groups.map(g => {
-                if (g.id === group.id) {
-                  const updatedGrids = g.grids.map(gr => 
-                    gr.id === grid.id ? { ...gr, name: newName } : gr
-                  );
-                  return { ...g, grids: updatedGrids };
-                }
-                return g;
-              });
-              setGroups(updatedGroups);
-              
+              onRenameGrid?.(group.id, grid.id, newName);
               if (selectedGrid?.id === grid.id) {
                 setSelectedGrid({ ...grid, name: newName });
               }

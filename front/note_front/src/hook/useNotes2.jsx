@@ -1,178 +1,163 @@
-import { useEffect, useState } from 'react';
-import { useNotes } from '../hook/useNote';
-import { clampToGrid, randomPosInGrid } from '../utils/gridBounds';
+import { useEffect, useState, useRef } from "react";
+import { useNotes } from "./useNote";
+import { clampToGrid, randomPosInGrid } from "../utils/gridBounds";
 
 export function useNotes2({ gridSize, selectedGrid, navigate }) {
-  const { getByUserId, createNotes, notes } = useNotes();
+    const { notes, getByUserId, createNotes, updateNotes , deleteNote} = useNotes();
 
-  const [tableNotes, setTableNotes] = useState([]);
-  const [selectedNote, setSelectedNote] = useState(null);
+    const [tableNotes, setTableNotes] = useState([]);
+    const [selectedNote, setSelectedNote] = useState(null);
+    const loadedRef = useRef(false);
 
-  // localStorage helpers for grid association
-  const setNoteGrid = (noteId, gridId) => {
-    try {
-      const mapStr = localStorage.getItem('noteGridMap');
-      const noteGridMap = mapStr ? JSON.parse(mapStr) : {};
-      noteGridMap[noteId] = gridId;
-      localStorage.setItem('noteGridMap', JSON.stringify(noteGridMap));
-    } catch {}
-  };
-  const removeNoteGrid = (noteId) => {
-    try {
-      const mapStr = localStorage.getItem('noteGridMap');
-      const noteGridMap = mapStr ? JSON.parse(mapStr) : {};
-      if (noteGridMap[noteId]) {
-        delete noteGridMap[noteId];
-        localStorage.setItem('noteGridMap', JSON.stringify(noteGridMap));
-      }
-    } catch {}
-  };
+    // --- Chargement initial des notes de l'utilisateur
+    useEffect(() => {
+        if (loadedRef.current) return;
+        loadedRef.current = true;
 
-  // Fetch notes on mount
-  useEffect(() => {
-    const fetchUserNotes = async () => {
-      const userId = sessionStorage.getItem('id_user');
-      if (!userId) {
-        navigate('/connexion');
-        return;
-      }
-      try {
-        const response = await getByUserId(userId);
-        // handle both axios response and direct array
-        const apiNotes = (response && response.data) ? response.data : (Array.isArray(response) ? response : (notes || []));
-        const mapStr = localStorage.getItem('noteGridMap');
-        const noteGridMap = mapStr ? JSON.parse(mapStr) : {};
-        const mapped = apiNotes.map((note) => ({
-          id: note.id.toString(),
-          title: note.title,
-          content: note.content,
-          contentPreview: (note.content || '').substring(0, 50),
-          creationDate: new Date(note.date).toISOString().split('T')[0],
-          gridId: noteGridMap[note.id] || null,
-          position: randomPosInGrid(undefined, gridSize),
-        }));
-        setTableNotes((prev) => {
-          const prevById = new Map(prev.map((n) => [n.id, n]));
-          return mapped.map((n) => {
-            const old = prevById.get(n.id);
-            return old ? { ...old, ...n, position: old.position || n.position, size: old.size || n.size } : n;
-          });
-        });
-      } catch (err) {
-        console.error('Erreur lors de la récupération des notes:', err);
-      }
-    };
-    fetchUserNotes();
-  }, [navigate]);
-
-  // Reclamp on grid size change and window resize
-  useEffect(() => {
-    setTableNotes((prev) => prev.map((n) => ({
-      ...n,
-      position: clampToGrid(n.position, n.size, gridSize),
-    })));
-  }, [gridSize.width, gridSize.height]);
-
-  useEffect(() => {
-    const onResize = () => {
-      setTableNotes((prev) => prev.map((n) => ({
-        ...n,
-        position: clampToGrid(n.position, n.size, gridSize),
-      })));
-    };
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, [gridSize]);
-
-  const updateNoteSize = (id, size) => {
-    setTableNotes((prev) => {
-      let changed = false;
-      const next = prev.map((n) => {
-        if (n.id !== id) return n;
-        const sameSize = n.size && n.size.w === size.w && n.size.h === size.h;
-        const newPos = clampToGrid(n.position, size, gridSize);
-        const samePos = n.position.x === newPos.x && n.position.y === newPos.y;
-        if (sameSize && samePos) return n;
-        changed = true;
-        return { ...n, size, position: newPos };
-      });
-      return changed ? next : prev;
-    });
-  };
-
-  const handleDragEnd = (event) => {
-    const { active, delta } = event;
-    const id = active.id;
-    setTableNotes((prev) =>
-      prev.map((note) =>
-        note.id === id
-          ? {
-              ...note,
-              position: clampToGrid(
-                {
-                  x: note.position.x + delta.x,
-                  y: note.position.y + delta.y,
-                },
-                note.size,
-                gridSize
-              ),
+        const fetchUserNotes = async () => {
+            const userId = sessionStorage.getItem("id_user");
+            if (!userId) {
+                navigate("/connexion");
+                return;
             }
-          : note
-      )
-    );
-  };
 
-  const handleCreateNote = async ({ title, content }) => {
-    const userId = sessionStorage.getItem('id_user');
-    if (!userId) {
-      navigate('/connexion');
-      return;
-    }
-    const newNoteData = {
-      title,
-      content,
-      date: new Date().toISOString(),
-      user: { id: userId },
+            try {
+                const res = await getByUserId(userId);
+                const apiNotes = Array.isArray(res.data) ? res.data : Array.isArray(res) ? res : [];
+
+                const mapped = apiNotes.map((note) => ({
+                    id: note.id.toString(),
+                    title: note.title,
+                    content: note.content,
+                    contentPreview: (note.content || "").substring(0, 50),
+                    creationDate: new Date(note.date).toISOString().split("T")[0],
+                    gridId: note.grid_id ?? null,
+                    position: { x: note.pos_x ?? 0, y: note.pos_y ?? 0 },
+                }));
+
+                setTableNotes(mapped);
+            } catch (err) {
+                console.error("❌ Erreur lors de la récupération des notes :", err);
+            }
+        };
+
+        fetchUserNotes();
+    }, [getByUserId, navigate, gridSize]);
+
+    // --- Recalcul position notes si la grille change
+    useEffect(() => {
+        setTableNotes((prev) =>
+            prev.map((n) => ({ ...n, position: clampToGrid(n.position, n.size, gridSize) }))
+        );
+    }, [gridSize]);
+
+    // --- Recalcul position notes sur resize
+    useEffect(() => {
+        const onResize = () => {
+            setTableNotes((prev) =>
+                prev.map((n) => ({ ...n, position: clampToGrid(n.position, n.size, gridSize) }))
+            );
+        };
+        window.addEventListener("resize", onResize);
+        return () => window.removeEventListener("resize", onResize);
+    }, [gridSize]);
+
+    // --- Création d'une note
+    const handleCreateNote = async ({ title, content }) => {
+        const userId = sessionStorage.getItem("id_user");
+        if (!userId) return navigate("/connexion");
+
+        const randPos = randomPosInGrid(undefined, gridSize);
+        const newNoteData = {
+            title,
+            content,
+            date: new Date().toISOString(),
+            user: { id: userId },
+            grid: selectedGrid?.id ? { id: selectedGrid.id } : null,
+            pos_x: randPos.x,
+            pos_y: randPos.y,
+            is_grid: Boolean(selectedGrid?.id),
+        };
+
+        try {
+            const createdNote = await createNotes(newNoteData);
+            const noteForFront = {
+                id: createdNote.id.toString(),
+                title: createdNote.title,
+                content: createdNote.content,
+                contentPreview: (createdNote.content || "").substring(0, 50),
+                creationDate: new Date(createdNote.date).toISOString().split("T")[0],
+                gridId: createdNote.grid_id ?? (selectedGrid?.id || null),
+                position: clampToGrid({ x: createdNote.pos_x ?? randPos.x, y: createdNote.pos_y ?? randPos.y }, undefined, gridSize)
+            };
+            setTableNotes((prev) => [...prev, noteForFront]);
+            setSelectedNote(noteForFront);
+        } catch (err) {
+            console.error("❌ Erreur lors de la création de la note :", err);
+        }
     };
-    try {
-      const response = await createNotes(newNoteData);
-      const createdNote = response.data;
-      const randPos = randomPosInGrid(undefined, gridSize);
-      const noteForFront = {
-        id: createdNote.id.toString(),
-        title: createdNote.title,
-        content: createdNote.content,
-        contentPreview: (createdNote.content || '').substring(0, 50),
-        creationDate: new Date(createdNote.date).toISOString().split('T')[0],
-        gridId: selectedGrid?.id || null,
-        position: randPos,
-      };
-      setTableNotes((prev) => [...prev, noteForFront]);
-      setSelectedNote(noteForFront);
-      if (selectedGrid?.id) setNoteGrid(createdNote.id, selectedGrid.id);
-    } catch (err) {
-      console.error('Erreur lors de la création de la note:', err);
-    }
-  };
 
-  const openNoteById = (id) => {
-    const note = tableNotes.find((n) => n.id === id);
-    if (note) setSelectedNote(note);
-  };
+    // --- Mise à jour d'une note existante
+    const handleUpdateNote = async (note) => {
+        try {
+            const updated = await updateNotes(note); // appel à l'API
+            // retourne l'objet mis à jour pour le parent
+            return { ...note, ...updated.data };
+        } catch (err) {
+            console.error("Erreur lors de la mise à jour de la note :", err);
+            throw err;
+        }
+    };
+    const handleDeleteNote = async (id) => {
+        try {
+            await deleteNote(id);
+            setTableNotes(prev => prev.filter(n => n.id !== id));
+            if (selectedNote?.id === id) setSelectedNote(null);
+        } catch (err) {
+            console.error("Erreur lors de la suppression de la note :", err);
+        }
+    };
+    // --- Drag & Resize
+    const updateNoteSize = (id, size) => {
+        setTableNotes((prev) =>
+            prev.map((n) =>
+                n.id === id ? { ...n, size, position: clampToGrid(n.position, size, gridSize) } : n
+            )
+        );
+    };
 
-  const closeNoteModal = () => setSelectedNote(null);
+    const handleDragEnd = (event) => {
+        const { active, delta } = event;
+        const id = active.id;
+        const note = tableNotes.find((n) => n.id === id);
+        if (!note) return;
 
-  return {
-    tableNotes,
-    setTableNotes,
-    selectedNote,
-    setSelectedNote,
-    updateNoteSize,
-    handleDragEnd,
-    handleCreateNote,
-    openNoteById,
-    closeNoteModal,
-    setNoteGrid,
-    removeNoteGrid,
-  };
+        const newPos = clampToGrid({ x: note.position.x + delta.x, y: note.position.y + delta.y }, note.size, gridSize);
+
+        setTableNotes((prev) =>
+            prev.map((n) => (n.id === id ? { ...n, position: newPos } : n))
+        );
+
+        handleUpdateNote({ ...note, pos_x: newPos.x, pos_y: newPos.y }).catch(() => {});
+    };
+
+    const openNoteById = (id) => {
+        const note = tableNotes.find((n) => n.id === id);
+        if (note) setSelectedNote(note);
+    };
+
+    const closeNoteModal = () => setSelectedNote(null);
+
+    return {
+        tableNotes,
+        selectedNote,
+        handleCreateNote,
+        handleDragEnd,
+        updateNoteSize,
+        openNoteById,
+        closeNoteModal,
+        handleUpdateNote,
+        handleDeleteNote,
+        setTableNotes,
+    };
 }

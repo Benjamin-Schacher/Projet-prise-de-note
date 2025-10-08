@@ -1,54 +1,53 @@
-import axios from "axios";
 import { useState } from "react";
 import { useInstanceAxios } from "./useInstanceAxios";
 
 export const useNotes = () => {
-	// Appelle d'useInstanceAxios qui contient la base de nos requêtes, URL et hook pour le JWT
-	const api = useInstanceAxios();
+    const api = useInstanceAxios();
 
-	// Déclaration de variable
-	const [notes, setNotes] = useState([]);
-	const [error, setError] = useState(null);
-	const [loading, setLoading] = useState(false);
+    const [notes, setNotes] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-	// Handleur de requête générique transmet les erreurs et le loading
-	const handleRequest = async (requestFunction, ...args) => {
-		setLoading(true);
-		setError(null);
+    // --- Handler générique pour toutes les requêtes
+    const handleRequest = async (requestFunction, ...args) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await requestFunction(...args);
+            setLoading(false);
+            return response.data ?? args[0]; // si data est undefined, retourne le premier argument (utile pour patch)
+        } catch (err) {
+            setLoading(false);
+            setError(err);
+            throw err;
+        }
+    };
 
-		try {
-			const response = await requestFunction(...args);
-			setNotes(response.data);
-			setLoading(false);
-			return response;
-		} catch (error) {
-			setLoading(false);
-			throw error;
-		}
-	};
+    // --- Notes
+    const getNotes = () => handleRequest(api.get, "/note/");
+    const getById = (id) => handleRequest(api.get, `/note/${id}`);
+    const getByUserId = (userId) => handleRequest(api.get, `/note/user/${userId}`);
+    const getByGrid = (gridId) => handleRequest(api.get, `/note/by-grid/${gridId}`);
+    const getPaginate = (pageIdx = 1, perPage = 10) => {
+        const url = `/note/?_page=${pageIdx}&_per_page=${perPage}`;
+        return handleRequest(api.get, url);
+    };
+    const createNotes = (note) => handleRequest(api.post, `/note`, note);
+    const updateNotes = (note) => handleRequest(api.patch, `/note/${note.id}`, note);
+    const deleteNote = (id) => handleRequest(api.delete, `/note/${id}`);
 
-	// Différente requette qui utilise le handler générique
-	const getNotes = () => handleRequest(api.get, "/note/");
-	const deleteNote = (id) => handleRequest(api.delete, `/note/${id}`);
-	const getById = (id) => handleRequest(api.get, `/note/${id}`);
-	const getByUserId = (id) => handleRequest(api.get, `/note/user/${id}`);
-	const getPaginate = (pageIdx = 1, perPage = 10) => {
-		const url = `/note/?_page=${pageIdx}&_per_page=${perPage}`;
-		return handleRequest(api.get, url);
-	};
-	const updateNotes = (notes) => handleRequest(api.patch, `/note/${notes.id}`, notes);
-	const createNotes = (notes) => handleRequest(api.post, `/note/`, notes);
-
-	return {
-		getNotes,
-		createNotes,
-		notes,
-		error,
-		getByUserId,
-		loading,
-		getById,
-		deleteNote,
-		getPaginate,
-		updateNotes,
-	};
+    return {
+        notes,
+        setNotes,
+        loading,
+        error,
+        getNotes,
+        getById,
+        getByUserId,
+        getByGrid,
+        getPaginate,
+        createNotes,
+        updateNotes,
+        deleteNote,
+    };
 };

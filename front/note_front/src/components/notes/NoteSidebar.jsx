@@ -12,6 +12,7 @@ const NoteSidebar = ({
   onRenameGroup,
   onAddGrid,
   onDeleteGrid,
+  onRenameGrid,
   setGroups,
   setSelectedGrid,
   sidebarWidth = '16rem'
@@ -49,6 +50,7 @@ const NoteSidebar = ({
             onRename={onRenameGroup}
             onAddGrid={onAddGrid}
             onDeleteGrid={onDeleteGrid}
+            onRenameGrid={onRenameGrid}
             groups={groups}
             setGroups={setGroups}
             setSelectedGrid={setSelectedGrid}
