@@ -52,23 +52,14 @@ export const HomePage = () => {
     }
 
 	const {
-		getNotes,
-		notes,
-		error,
 		createNotes,
-		loading,
 		getByUserId,
-		getById,
 		deleteNote,
-		getPaginate,
-		updateNotes,
 	} = useNotes();
 
 	const [tableNotes, setTableNotes] = useState([]);
-	const [user_id, setUser_id] = useState();
 	const [selectedNote, setSelectedNote] = useState(null);
-	const [newNoteTitle, setNewNoteTitle] = useState("titre");
-	const [newNoteContent, setNewNoteContent] = useState("contenue");
+
 
 	// Ecouteur d'évenement de lacher d'un élément dragable, mise a jour de la posion x, y de la note
 	const handleDragEnd = (event) => {
@@ -143,7 +134,7 @@ export const HomePage = () => {
 		};
 
 		// appel de la fonction pour récupérer les notes de l'utilisateur
-		fetchNotes();
+		fetchNotes().catch((err) => console.error(err));
 
 		// application du fond en liège; todo -> le faire proprement
 		document.body.style.backgroundImage = "url('/tableau-liege.jpg')";
@@ -157,11 +148,7 @@ export const HomePage = () => {
 	}, [navigate]);
 
 	// metre a jour la position des post-it
-	const updatePosition = (id, newPos) => {
-		setTableNotes((prev) =>
-			prev.map((note) => (note.id === id ? { ...note, position: newPos } : note))
-		);
-	};
+
 
 	// handler pour la suppréssion de la note avec gestion d'érreur
 	const handleDeleteNote = async (noteId) => {

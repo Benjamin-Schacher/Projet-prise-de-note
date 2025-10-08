@@ -3,7 +3,7 @@ import { useNotes } from "./useNote";
 import { clampToGrid, randomPosInGrid } from "../utils/gridBounds";
 
 export function useNotes2({ gridSize, selectedGrid, navigate }) {
-    const { notes, getByUserId, createNotes, updateNotes , deleteNote} = useNotes();
+    const { getByUserId, createNotes, updateNotes , deleteNote} = useNotes();
 
     const [tableNotes, setTableNotes] = useState([]);
     const [selectedNote, setSelectedNote] = useState(null);
@@ -46,8 +46,8 @@ export function useNotes2({ gridSize, selectedGrid, navigate }) {
             }
         };
 
-        fetchUserNotes();
-    }, [getByUserId, navigate]);
+            fetchUserNotes().catch(err => console.error(err));
+        }, [getByUserId, navigate]);
 
 
     // --- Recalcul position notes si la grille change

@@ -12,8 +12,6 @@ const Group = ({
   onAddGrid, 
   onDeleteGrid,
   onRenameGrid,
-  groups,
-  setGroups,
   setSelectedGrid
 }) => {
     // gère le renommage du groupe et le focus sur l'input

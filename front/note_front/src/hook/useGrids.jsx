@@ -44,11 +44,9 @@ export function useGrids(defaultGridSize = { width: 800, height: 600 }) {
         const load = async () => {
             console.log('🔄 Chargement des groupes et grilles pour user', currentUserId);
             try {
-                let rawGroups = [];
-
                 // 🔹 Récupération des groupes de l’utilisateur
                 const resGroups = await api.get(`/groups/user/${currentUserId}`);
-                rawGroups = Array.isArray(resGroups?.data) ? resGroups.data : [];
+                const rawGroups = Array.isArray(resGroups?.data) ? resGroups.data : [];
 
                 const groupsWithGrids = await Promise.all(
                     rawGroups.map(async (g) => {
@@ -84,7 +82,7 @@ export function useGrids(defaultGridSize = { width: 800, height: 600 }) {
             }
         };
 
-        load();
+        load().catch(err => console.error('Erreur load() dans useEffect:', err));
     }, [api, defaultGridSize, userId]);
 
     // Sélectionne la première grille dispo si aucune sélectionnée

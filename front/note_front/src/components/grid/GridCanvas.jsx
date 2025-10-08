@@ -3,9 +3,9 @@ import React, { useCallback, useState, useEffect } from 'react';
 const GridCanvas = ({
   selectedGrid,
   cellSize = 30,
-  width = 800,  //taile de base de la grille
+  width = 800,  //taille de base de la grille
   height = 600,
-  onSizeChange = ({ width, height }) => {}, // fonction de callback pour gérer les changements de taille
+  onSizeChange = ({}) => {}, // fonction de callback pour gérer les changements de taille
   renderActions = null, // rendu optionnel d'actions dans l'entête
 }) => {
   const [localWidth, setLocalWidth] = useState(width);
@@ -59,27 +59,22 @@ const GridCanvas = ({
                   value={localWidth}
                   //gestion de la modification de la taille de la grille min 100 max 2000 pour les deux valeurs
                   onChange={(e) => {
-                    const value = e.target.value;
-                    setLocalWidth(value);
-                    
-                    if (value === '') return;
-                    
-                    const numValue = Number(value);
-                    if (!isNaN(numValue) && numValue >= 100 && numValue <= 2000) {
-                      onSizeChange({ width: numValue, height });
-                    }
+                      const value = e.target.value;
+                      const numValue = Number(value); // convertir en number
+
+                      setLocalWidth(numValue); // passer un number, pas une string
+
+                      if (!isNaN(numValue) && numValue >= 100 && numValue <= 2000) {
+                          onSizeChange({ width: numValue, height: localHeight }); // utiliser localHeight
+                      }
                   }}
                   onBlur={(e) => {
-                    const numValue = Number(e.target.value);
-                    if (isNaN(numValue) || numValue < 100) {
-                      const newWidth = 100;
-                      setLocalWidth(newWidth);
-                      onSizeChange({ width: newWidth, height });
-                    } else if (numValue > 2000) {
-                      const newWidth = 2000;
-                      setLocalWidth(newWidth);
-                      onSizeChange({ width: newWidth, height });
-                    }
+                      let numValue = Number(e.target.value);
+                      if (isNaN(numValue) || numValue < 100) numValue = 100;
+                      else if (numValue > 2000) numValue = 2000;
+
+                      setLocalWidth(numValue);
+                      onSizeChange({ width: numValue, height: localHeight });
                   }}
                   className="w-20 px-2 py-1 rounded bg-gray-700 text-white text-sm"
                   min="100"
@@ -93,28 +88,24 @@ const GridCanvas = ({
                   type="number" 
                   value={localHeight}
                   onChange={(e) => {
-                    const value = e.target.value;
-                    setLocalHeight(value);
-                    
-                    if (value === '') return;
-                    
-                    const numValue = Number(value);
-                    if (!isNaN(numValue) && numValue >= 100 && numValue <= 2000) {
-                      onSizeChange({ width, height: numValue });
-                    }
+                      const value = e.target.value;
+                      const numValue = Number(value);
+
+                      setLocalHeight(numValue);
+
+                      if (!isNaN(numValue) && numValue >= 100 && numValue <= 2000) {
+                          onSizeChange({ width: localWidth, height: numValue }); // utiliser localWidth
+                      }
                   }}
                   onBlur={(e) => {
-                    const numValue = Number(e.target.value);
-                    if (isNaN(numValue) || numValue < 100) {
-                      const newHeight = 100;
-                      setLocalHeight(newHeight);
-                      onSizeChange({ width, height: newHeight });
-                    } else if (numValue > 2000) {
-                      const newHeight = 2000;
-                      setLocalHeight(newHeight);
-                      onSizeChange({ width, height: newHeight });
-                    }
+                      let numValue = Number(e.target.value);
+                      if (isNaN(numValue) || numValue < 100) numValue = 100;
+                      else if (numValue > 2000) numValue = 2000;
+
+                      setLocalHeight(numValue);
+                      onSizeChange({ width: localWidth, height: numValue });
                   }}
+
                   className="w-20 px-2 py-1 rounded bg-gray-700 text-white text-sm"
                   min="100"
                   max="2000"
@@ -153,7 +144,7 @@ const GridCanvas = ({
             </div>
           </div>
         </>
-          // si pas de grille selectionnée affiche un message
+          // si pas de grille selectionner affiche un message
       ) : (
           <div className="flex-1 flex items-center justify-center">
               <p className="text-gray-400">Sélectionnez une grille pour commencer</p>

@@ -42,8 +42,8 @@ export const Note = () => {
         handleDeleteNote,
     } = useNotes2({ gridSize, selectedGrid, navigate });
 
-    const [newNoteTitle, setNewNoteTitle] = useState('titre');
-    const [newNoteContent, setNewNoteContent] = useState('contenue');
+    const [newNoteTitle] = useState('titre');
+    const [newNoteContent] = useState('contenue');
 
 
     // --- Créer une note
