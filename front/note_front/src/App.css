@@ -428,7 +428,7 @@ fieldset{
 .calendar-container {
   color: #fff; /* Texte blanc pour contraste */
   background-color: transparent; /* Fond transparent pour voir le fond noir */
-      margin-top: -148px;
+      margin-top: -75px;
 }
 
 .calendar-container h2 {
@@ -457,7 +457,7 @@ fieldset{
 }
 
 .calendar-container button {
-  background-color: grey;
+  background-color: #ffffff;
   color: #000;
   padding: 8px 16px;
   border: none;
@@ -475,16 +475,27 @@ fieldset{
 }
 
 .rbc-toolbar {
-  background-color: #222; /* Fond sombre pour la barre d'outils */
+  background-color: transparent; /* Fond sombre pour la barre d'outils */
 }
 
-.rbc-toolbar-label,
+.rbc-btn-group button,
+.form-container button {
+    background-color : white !important;
+}
+
+.form-container button,
 .rbc-btn-group button {
-  color: #fff !important; /* Boutons et texte blanc */
+  color: black !important;
+  background-color: transparent;
+}
+.rbc-toolbar-label {
+  color: white !important;
+  background-color: transparent;
 }
 
+.form-container button:hover,
 .rbc-btn-group button:hover {
-  background-color: #444 !important;
+  background-color: grey !important;
 }
 
 .rbc-event {
@@ -507,6 +518,15 @@ fieldset{
   border-color: #fff !important; /* Bordures blanches */
 }
 
+.rbc-header {
+    color: black;
+}
+
+.rbc-day-bg,
+.rbc-month-view {
+   background-color: wheat;
+}
+
 .rbc-time-header,
 .rbc-time-content {
   color: #fff !important;
@@ -517,4 +537,36 @@ fieldset{
 .rbc-agenda-view td {
   color: #fff !important;
   border-color: #fff !important;
+}
+
+.form-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 34px;
+    background-color: #00000040;
+    padding: 15px;
+}
+
+.form-container {
+    align-content: center;
+}
+
+.form-container h3 {
+    font-size: 25px;
+    padding-bottom: 30px;
+}
+
+.form-container label {
+    font-size: 15px;
+    padding-bottom: 30px;
+    font-weight: 700;
+}
+
+.form-container textarea, input {
+    background-color: white;
+    color: black;
+}
+
+.form-container input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(100%);
 }
