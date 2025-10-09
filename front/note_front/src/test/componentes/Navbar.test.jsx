@@ -28,9 +28,10 @@ describe("Navbar", () => {
       </BrowserRouter>
     );
 
+
     expect(screen.getByText("Accueil")).toBeInTheDocument();
     expect(screen.getByText("Notes")).toBeInTheDocument();
-    expect(screen.getByText("Login")).toBeInTheDocument();
+    expect(screen.getByText("Connexion")).toBeInTheDocument();
   });
 
   test("displays Déconnexion button when authenticated", () => {
