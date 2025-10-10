@@ -1,6 +1,8 @@
 package com.dawan.MesNotes.entities;
 
 import com.dawan.MesNotes.entities.heritage.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,7 +28,24 @@ public class Note extends BaseEntity {
 
     private LocalDateTime date;
 
+    private int pos_x;
+
+    private int pos_y;
+
+    @Column(nullable = false,name = "is_grid")
+    private boolean is_grid;
+
+    @ManyToOne
+    @JoinColumn(name = "grid_id")
+    @JsonBackReference // sérialisation "enfant"
+    private Grid grid;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @JsonProperty("grid_id")
+    public Long getGridId() {
+        return grid != null ? grid.getId() : null;
+    }
 }
