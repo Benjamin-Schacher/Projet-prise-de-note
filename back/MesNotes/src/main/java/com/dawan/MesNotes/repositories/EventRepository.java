@@ -1,6 +1,7 @@
 package com.dawan.MesNotes.repositories;
 
 import com.dawan.MesNotes.entities.Event;
+import com.dawan.MesNotes.entities.Note;
 import com.dawan.MesNotes.entities.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,4 +12,6 @@ import java.time.LocalDateTime;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
     Page<Event> findByStartDateAfterAndUser(LocalDateTime startDate, User user, Pageable pageable);
+
+    Page<Event> findByUser(User user, Pageable pageable);
 }

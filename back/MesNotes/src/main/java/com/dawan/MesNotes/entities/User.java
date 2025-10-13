@@ -43,7 +43,6 @@ public class User extends BaseEntity implements UserDetails {
 
     @OneToMany(mappedBy = "user")
     @ToString.Exclude
-    @ElementCollection
     @JsonIgnore
     private List<Event> events;
 

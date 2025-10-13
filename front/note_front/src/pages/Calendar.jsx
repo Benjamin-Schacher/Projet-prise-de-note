@@ -10,187 +10,187 @@ import { EventForm } from "../components/form/eventForm.jsx";
 
 // Configuration de la localisation pour react-big-calendar
 const localizer = dateFnsLocalizer({
-  format,
-  parse,
-  startOfWeek,
-  getDay,
-  locales: { fr },
+	format,
+	parse,
+	startOfWeek,
+	getDay,
+	locales: { fr },
 });
 
 export function Calendar() {
-  const navigate = useNavigate();
-  const { getByUserId, createEvent, updateEvent, loading, error } = useEvents();
-  const { isAuthenticated } = useAuth();
-  const [tableEvents, setTableEvents] = useState([]);
-  const [calendarEvents, setCalendarEvents] = useState([]);
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [currentView, setCurrentView] = useState(Views.MONTH);
-  const [newEvent, setNewEvent] = useState({
-    title: "",
-    content: "",
-    startDate: "",
-    endDate: "",
-  });
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const [editMode, setEditMode] = useState(false);
+	const navigate = useNavigate();
+	const { getByUserId, createEvent, updateEvent, loading, error } = useEvents();
+	const { isAuthenticated } = useAuth();
+	const [tableEvents, setTableEvents] = useState([]);
+	const [calendarEvents, setCalendarEvents] = useState([]);
+	const [currentDate, setCurrentDate] = useState(new Date());
+	const [currentView, setCurrentView] = useState(Views.MONTH);
+	const [newEvent, setNewEvent] = useState({
+		title: "",
+		content: "",
+		startDate: "",
+		endDate: "",
+	});
+	const [selectedEvent, setSelectedEvent] = useState(null);
+	const [editMode, setEditMode] = useState(false);
 
-  // Charger les événements
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (!isAuthenticated()) {
-          navigate("/connexion");
-          return;
-        }
-        await fetchUserEvents();
-      } catch (err) {
-        console.error("Erreur lors du chargement des événements :", err);
-      }
-    };
+	// Charger les événements
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				if (!isAuthenticated()) {
+					navigate("/connexion");
+					return;
+				}
+				await fetchUserEvents();
+			} catch (err) {
+				console.error("Erreur lors du chargement des événements :", err);
+			}
+		};
 
-    fetchData();
-  }, []);
+		fetchData();
+	}, []);
 
-  // Mettre à jour calendarEvents lorsque tableEvents change
-  useEffect(() => {
-    const mappedEvents = Array.isArray(tableEvents)
-      ? tableEvents.map((event) => ({
-          id: event.id,
-          title: event.title,
-          start: new Date(event.startDate),
-          end: event.endDate ? new Date(event.endDate) : new Date(event.startDate),
-        }))
-      : [];
-    setCalendarEvents(mappedEvents);
-  }, [tableEvents]);
+	// Mettre à jour calendarEvents lorsque tableEvents change
+	useEffect(() => {
+		const mappedEvents = Array.isArray(tableEvents)
+			? tableEvents.map((event) => ({
+					id: event.id,
+					title: event.title,
+					start: new Date(event.startDate),
+					end: event.endDate ? new Date(event.endDate) : new Date(event.startDate),
+			  }))
+			: [];
+		setCalendarEvents(mappedEvents);
+	}, [tableEvents]);
 
-  // Récupérer les événements de l'utilisateur connecté
-  const fetchUserEvents = async () => {
-    try {
-      const resp = await getByUserId();
-      const apiEvents = Array.isArray(resp.data.content) ? resp.data.content : [];
-      setTableEvents(apiEvents);
-    } catch (err) {
-      console.error("Erreur lors de la récupération des événements :", err);
-      setTableEvents([]);
-    }
-  };
+	// Récupérer les événements de l'utilisateur connecté
+	const fetchUserEvents = async () => {
+		try {
+			const resp = await getByUserId();
+			const apiEvents = Array.isArray(resp.data.content) ? resp.data.content : [];
+			setTableEvents(apiEvents);
+		} catch (err) {
+			console.error("Erreur lors de la récupération des événements :", err);
+			setTableEvents([]);
+		}
+	};
 
-  // Gérer la navigation
-  const handleNavigate = (newDate) => {
-    setCurrentDate(newDate);
-  };
+	// Gérer la navigation
+	const handleNavigate = (newDate) => {
+		setCurrentDate(newDate);
+	};
 
-  // Gérer le changement de vue
-  const handleViewChange = (view) => {
-    setCurrentView(view);
-  };
+	// Gérer le changement de vue
+	const handleViewChange = (view) => {
+		setCurrentView(view);
+	};
 
-  // Gérer la sélection d'un événement
-  const handleSelectEvent = (event) => {
-    setSelectedEvent(event);
-    setNewEvent({
-      title: event.title,
-      content: tableEvents.find((e) => e.id === event.id)?.content || "",
-      startDate: format(new Date(event.start), "yyyy-MM-dd'T'HH:mm"),
-      endDate: event.end ? format(new Date(event.end), "yyyy-MM-dd'T'HH:mm") : "",
-    });
-    setEditMode(true);
-  };
+	// Gérer la sélection d'un événement
+	const handleSelectEvent = (event) => {
+		setSelectedEvent(event);
+		setNewEvent({
+			title: event.title,
+			content: tableEvents.find((e) => e.id === event.id)?.content || "",
+			startDate: format(new Date(event.start), "yyyy-MM-dd'T'HH:mm"),
+			endDate: event.end ? format(new Date(event.end), "yyyy-MM-dd'T'HH:mm") : "",
+		});
+		setEditMode(true);
+	};
 
-  // Gérer la soumission du formulaire pour ajouter ou modifier un événement
-  const handleSubmitEvent = async (e) => {
-    e.preventDefault();
-    try {
-      const eventData = {
-        title: newEvent.title,
-        content: newEvent.content,
-        startDate: new Date(newEvent.startDate).toISOString(),
-        endDate: newEvent.endDate ? new Date(newEvent.endDate).toISOString() : null,
-        user: {
-          id: sessionStorage.getItem("id_user"),
-        },
-      };
+	// Gérer la soumission du formulaire pour ajouter ou modifier un événement
+	const handleSubmitEvent = async (e) => {
+		e.preventDefault();
+		try {
+			const eventData = {
+				title: newEvent.title,
+				content: newEvent.content,
+				startDate: new Date(newEvent.startDate).toISOString(),
+				endDate: newEvent.endDate ? new Date(newEvent.endDate).toISOString() : null,
+				user: {
+					id: sessionStorage.getItem("id_user"),
+				},
+			};
 
-      if (editMode) {
-        await updateEvent({ ...eventData, id: selectedEvent.id });
-      } else {
-        await createEvent(eventData);
-      }
+			if (editMode) {
+				await updateEvent({ ...eventData, id: selectedEvent.id });
+			} else {
+				await createEvent(eventData);
+			}
 
-      setNewEvent({ title: "", content: "", startDate: "", endDate: "" });
-      setEditMode(false);
-      setSelectedEvent(null);
-      await fetchUserEvents();
-    } catch (err) {
-      console.error("Erreur lors de la gestion de l'événement :", err);
-    }
-  };
+			setNewEvent({ title: "", content: "", startDate: "", endDate: "" });
+			setEditMode(false);
+			setSelectedEvent(null);
+			await fetchUserEvents();
+		} catch (err) {
+			console.error("Erreur lors de la gestion de l'événement :", err);
+		}
+	};
 
-  // Gérer les changements dans le formulaire
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewEvent((prev) => ({ ...prev, [name]: value }));
-  };
+	// Gérer les changements dans le formulaire
+	const handleInputChange = (e) => {
+		const { name, value } = e.target;
+		setNewEvent((prev) => ({ ...prev, [name]: value }));
+	};
 
-  // Annuler la modification
-  const handleCancelEdit = () => {
-    setNewEvent({ title: "", content: "", startDate: "", endDate: "" });
-    setEditMode(false);
-    setSelectedEvent(null);
-  };
+	// Annuler la modification
+	const handleCancelEdit = () => {
+		setNewEvent({ title: "", content: "", startDate: "", endDate: "" });
+		setEditMode(false);
+		setSelectedEvent(null);
+	};
 
-  return (
-      <>
-        <div className="background-event"></div>
-        <div style={{ display: "flex", height: "80vh", padding: "20px" }}>
-          {/* Formulaire dans un conteneur séparé */}
-          <EventForm
-            newEvent={newEvent}
-            setNewEvent={setNewEvent}
-            editMode={editMode}
-            setEditMode={setEditMode}
-            selectedEvent={selectedEvent}
-            handleSubmitEvent={handleSubmitEvent}
-            handleInputChange={handleInputChange}
-            handleCancelEdit={handleCancelEdit}
-          />
+	return (
+		<>
+			<div className="background-event"></div>
+			<div style={{ display: "flex", height: "80vh", padding: "20px" }}>
+				{/* Formulaire dans un conteneur séparé */}
+				<EventForm
+					newEvent={newEvent}
+					setNewEvent={setNewEvent}
+					editMode={editMode}
+					setEditMode={setEditMode}
+					selectedEvent={selectedEvent}
+					handleSubmitEvent={handleSubmitEvent}
+					handleInputChange={handleInputChange}
+					handleCancelEdit={handleCancelEdit}
+				/>
 
-          {/* Conteneur du calendrier */}
-          <div className="calendar-container" style={{ flex: 1, padding: "20px" }}>
-            <h2>Mon Calendrier</h2>
-            {loading && <p style={{ color: "#fff" }}>Chargement...</p>}
-            {error && (
-              <p style={{ color: "#fff" }}>
-                Erreur : {typeof error === "object" ? JSON.stringify(error) : error}
-              </p>
-            )}
+				{/* Conteneur du calendrier */}
+				<div className="calendar-container" style={{ flex: 1, padding: "20px" }}>
+					<h2>Mon Calendrier</h2>
+					{loading && <p style={{ color: "#fff" }}>Chargement...</p>}
+					{error && (
+						<p style={{ color: "#fff" }}>
+							Erreur : {typeof error === "object" ? JSON.stringify(error) : error}
+						</p>
+					)}
 
-            {/* Calendrier */}
-            <BigCalendar
-              localizer={localizer}
-              events={calendarEvents}
-              startAccessor="start"
-              endAccessor="end"
-              style={{ height: "100%" }}
-              date={currentDate}
-              view={currentView}
-              views={[Views.MONTH, Views.WEEK, Views.DAY, Views.AGENDA]}
-              onNavigate={handleNavigate}
-              onView={handleViewChange}
-              onSelectEvent={handleSelectEvent}
-              messages={{
-                next: "Suivant",
-                previous: "Précédent",
-                today: "Aujourd'hui",
-                month: "Mois",
-                week: "Semaine",
-                day: "Jour",
-                agenda: "Agenda",
-              }}
-            />
-          </div>
-        </div>
-      </>
-    );
-  }
+					{/* Calendrier */}
+					<BigCalendar
+						localizer={localizer}
+						events={calendarEvents}
+						startAccessor="start"
+						endAccessor="end"
+						style={{ height: "100%" }}
+						date={currentDate}
+						view={currentView}
+						views={[Views.MONTH, Views.WEEK, Views.DAY, Views.AGENDA]}
+						onNavigate={handleNavigate}
+						onView={handleViewChange}
+						onSelectEvent={handleSelectEvent}
+						messages={{
+							next: "Suivant",
+							previous: "Précédent",
+							today: "Aujourd'hui",
+							month: "Mois",
+							week: "Semaine",
+							day: "Jour",
+							agenda: "Agenda",
+						}}
+					/>
+				</div>
+			</div>
+		</>
+	);
+}

@@ -28,6 +28,7 @@ public class EventController extends GenericController<Event, Long, EventService
     public Page<Event> showEvent(Pageable pageable) {
         return service.all(pageable);
     }
+
     @GetMapping("/searchAfterDate")
     public Page<Event> searchEventsAfterDate(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,

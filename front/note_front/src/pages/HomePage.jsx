@@ -24,7 +24,7 @@ export const HomePage = () => {
                 ? "scale(1.1)"
                 : undefined,
             transition: isDragging ? "none" : "left 0.3s ease, top 0.3s ease, transform 0.3s ease",
-            zIndex: zIndex, // <-- appliquer le zIndex
+            zIndex: zIndex,
         };
 
         const innerStyle = {
@@ -117,17 +117,17 @@ export const HomePage = () => {
 	// Récupérer tout les notes du user connecter avec son id
 	function getAllNotes(idUser) {
         getByUserId(idUser).then((resp) => {
-            const apiNotes = resp.data.content; // <-- c'est ici que sont tes notes
+            const apiNotes = resp.data.content;
             const tableNotes = apiNotes.map((note) => {
                 const width = window.innerWidth;
                 const height = window.innerHeight;
 
                 return {
-                    id: note.id.toString(),
+                    id: note.id,
                     title: note.title,
                     content: note.content,
                     contentPreview: note.content.substring(0, 50),
-                    creationDate: new Date(note.date).toISOString().split("T")[0],
+                    creationDate: new Date(note.date),
                     position: {
                         x: Math.floor(Math.random() * (width - 2 * 200)) + 200,
                         y: Math.floor(Math.random() * (height - 2 * 200)) + 200,

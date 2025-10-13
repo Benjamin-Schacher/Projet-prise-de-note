@@ -21,6 +21,11 @@ public class EventService extends GenericService<Event, Long, EventRepository> {
         super(repo);
     }
 
+    public Page<Event> all(Pageable pageable) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return repo.findByUser(currentUser, pageable);
+    }
+
     public Page<Event> findByDateAfter(LocalDateTime startDate, Pageable pageable) {
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return repo.findByStartDateAfterAndUser(startDate, currentUser, pageable);
