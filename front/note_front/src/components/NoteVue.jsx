@@ -51,18 +51,18 @@ export function NoteVue({ note_id, title, creationDate, content, onClose, onUpda
 			});
 
 			//affichage de la note
-			setIsEditing(false);
-		} catch (error) {
-			console.error(error);
-			alert("Impossible d'envoyer les modifications");
-		}
-	};
+            setIsEditing(false);
+        } catch (error) {
+            console.error("Erreur lors de l'envoi :", error);
+            alert("Impossible d'envoyer les modifications");
+        }
+    };
 
 	return (
 		<div className="popup-vue-note">
 			<div className="note-vue-header">
 				<div className="note-vue-header-first-chield">
-					<p>{creationDate}</p>
+                    <p>Date de création : {creationDate?.toLocaleString()}</p>
 					{!isEditing ? (
 						<p className="note-vue-title">{newTitle}</p>
 					) : (

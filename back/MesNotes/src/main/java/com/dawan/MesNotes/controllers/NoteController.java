@@ -36,7 +36,7 @@ public class NoteController extends GenericController<Note, Long, NoteService> {
     }
 
 
-    @PatchMapping("/note_with_grid/{id}")
+    @PatchMapping("/with-grid/{id}")
     public ResponseEntity<Note> patchNote(@PathVariable Long id, @RequestBody Note note) {
         Note existing = service.byId(id).orElseThrow(() -> new RuntimeException("Note not found"));
         if (note.getTitle() != null) existing.setTitle(note.getTitle());

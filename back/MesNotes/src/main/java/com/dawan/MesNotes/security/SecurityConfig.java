@@ -28,7 +28,7 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
     private final CustomUserDetailsService userDetailsService;
     private final JwtUtils jwtUtils;
-    private final JwtRequestFilter jwtRequestFilter;
+    // JwtRequestFilter is now created as a @Bean to avoid circular dependency
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -40,6 +40,11 @@ public class SecurityConfig {
         AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
         return authenticationManagerBuilder.build();
+    }
+
+    @Bean
+    public JwtRequestFilter jwtRequestFilter() {
+        return new JwtRequestFilter(jwtUtils, userDetailsService);
     }
 
     @Bean
@@ -58,8 +63,8 @@ public class SecurityConfig {
                             .authenticationEntryPoint(authenticationEntryPoint))
                     // Configure la gestion de session.
                     .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                    // Tu ajoutes ton filtre JWT personnalisé (filter) avant le filtre de Spring Security qui gère l’authentification par formulaire.
-                    .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+                    // Add JWT filter before the Spring Security filter that handles form authentication
+                    .addFilterBefore(jwtRequestFilter(), UsernamePasswordAuthenticationFilter.class)
                     .build();
     }
 }

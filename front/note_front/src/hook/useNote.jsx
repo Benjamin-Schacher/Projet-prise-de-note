@@ -27,11 +27,13 @@ export const useNotes = () => {
 		}
 	};
 
+
 	// Différente requette qui utilise le handler générique
 	const getNotes = () => handleRequest(api.get, "/note/");
 	const deleteNote = (id) => handleRequest(api.delete, `/note/${id}`);
 	const getById = (id) => handleRequest(api.get, `/note/${id}`);
 	const getByUserId = (id) => handleRequest(api.get, `/note/mesNotes`);
+    const getByGrid = (gridId) => handleRequest(api.get, `/note/by-grid/${gridId}`);
 	const getPaginate = (pageIdx = 1, perPage = 10) => {
 		const url = `/note/?_page=${pageIdx}&_per_page=${perPage}`;
 		return handleRequest(api.get, url);
@@ -39,16 +41,18 @@ export const useNotes = () => {
 	const updateNotes = (notes) => handleRequest(api.patch, `/note/${notes.id}`, notes);
 	const createNotes = (notes) => handleRequest(api.post, `/note/`, notes);
 
-	return {
-		getNotes,
-		createNotes,
-		notes,
-		error,
-		getByUserId,
-		loading,
-		getById,
-		deleteNote,
-		getPaginate,
-		updateNotes,
-	};
+    return {
+        notes,
+        setNotes,
+        loading,
+        error,
+        getNotes,
+        getById,
+        getByUserId,
+        getByGrid,
+        getPaginate,
+        createNotes,
+        updateNotes,
+        deleteNote,
+    };
 };
