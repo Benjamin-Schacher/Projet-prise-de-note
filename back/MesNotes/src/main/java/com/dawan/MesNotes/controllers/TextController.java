@@ -38,7 +38,7 @@ public class TextController {
         }
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/user/{userId}")
     public ResponseEntity<List<Text>> getTextsByUser(@PathVariable Long userId) {
         return ResponseEntity.ok(textService.findByUserId(userId));
     }

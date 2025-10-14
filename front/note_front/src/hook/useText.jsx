@@ -7,8 +7,11 @@ export const useText = () => {
   const [texts, setTexts] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  // Création d’une note
+  const user_id = sessionStorage.getItem("id_user");
 
   function extractTitleFromContent(content) {
+    setError(null);
     try {
       const json = typeof content === "string" ? JSON.parse(content) : content;
       const root = json.root;
@@ -32,7 +35,8 @@ export const useText = () => {
         }
       }
     } catch (e) {
-      console.error("Erreur parsing JSON", e);
+      //console.error("Erreur parsing JSON", e);
+      setError("Une erreur est survenue...");
     }
 
     return "Sans titre";
@@ -56,7 +60,7 @@ export const useText = () => {
 
       return data; // On retourne les données
     } catch (error) {
-      console.error("Error loading notes:", error);
+      //console.error("Error loading notes:", error);
       setError("Une erreur est survenue.");
       return null;
     } finally {
@@ -85,11 +89,8 @@ export const useText = () => {
   };
 
   // Récupération des notes
-  const fetchTexts = (page = 0, size = 10) =>
-    handleRequest(api.get, `/text?page=${page}&size=${size}`);
-
-  // Création d’une note
-  const user_id = sessionStorage.getItem("id_user");
+  const fetchTexts = () =>
+    handleRequest(api.get, `text/user/${user_id}`);
 
   const addText = async ( content) => {
 
@@ -109,16 +110,17 @@ export const useText = () => {
   // Patch avec debounce
  const debouncedUpdate = useRef(
   debounce(async (id, updatedFields) => {
+    setError(null);
     try {
       // Génère le title depuis le contenu
       const title = extractTitleFromContent(updatedFields.content);
-      console.log("PATCH envoyé :", id, title, updatedFields);
+      //console.log("PATCH envoyé :", id, title, updatedFields);
 
       // On combine content et title dans le même objet pour le patch
       const response = await api.patch(`/text/${id}`, { ...updatedFields, title });
       const updatedText = response.data;
 
-      console.log("Réponse PATCH :", updatedText);
+      //console.log("Réponse PATCH :", updatedText);
 
       // Mise à jour locale
       setTexts(prev =>
@@ -126,7 +128,8 @@ export const useText = () => {
       );
 
     } catch (err) {
-      console.error("Erreur lors de la mise à jour :", err);
+      //console.error("Erreur lors de la mise à jour :", err);
+      setError("Une erreur est survenue...");
     }
   }, 1000)
 ).current;
@@ -135,7 +138,6 @@ export const useText = () => {
 const updateText = (id, updatedFields) => {
   debouncedUpdate(id, updatedFields);
 };
-
 
   // Suppression
   const deleteText = (id) => api.delete(`/text/${id}`);

@@ -14,8 +14,6 @@ export default function TextEditorPage() {
   // Ajouter un texte
   const handleAddText = async () => {
     // Création côté serveur via l'API
-    //const newText = await addText({ root: { type: "root", children: [{"type":"heading","tag":"h1","children":[{"text":"Nouveau texte"}]}] } });
-
     const newText = await addText({"root": {"children": [{"children": [
               {
                 "detail": 0,
@@ -47,12 +45,14 @@ export default function TextEditorPage() {
   };
 
   const handleSelectText = (text) => {
+    setError(null);
     if (!editorRef.current) return;
     let contentObj;
     try {
       contentObj = JSON.parse(text.content); // parse la string JSON
     } catch (e) {
-      console.error("Impossible de parser JSON :", e);
+      //console.error("Impossible de parser JSON :", e);
+      setError("Une erreur est survenue...");
       return;
     }
 
@@ -61,7 +61,7 @@ export default function TextEditorPage() {
     || editorRef.current.setMarkdown?.(markdown)
     || editorRef.current.setValue?.(markdown); 
 
-    console.log("ContentObj: ", contentObj.root);
+    //console.log("ContentObj: ", contentObj.root);
 
     setSelectedText(text);
 
@@ -75,8 +75,8 @@ export default function TextEditorPage() {
 
     const updatedContent = editorRef.current.getJSON(); 
     //console.log("updatedContent : ", updatedContent);
+    
     const serializedContent = JSON.stringify(updatedContent);
-
    // console.log("serializedContent : ", serializedContent);
 
      // Ne rien faire si le contenu n'a pas changé
