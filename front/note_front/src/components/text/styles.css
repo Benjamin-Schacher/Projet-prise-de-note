@@ -40,7 +40,7 @@
   display: flex;
   flex-direction: column;
   height: 90vh;
-  margin-left: 1em;
+  margin-left: 6em;
 }
 
 /* Editor Header - contains toolbar and tabs */
