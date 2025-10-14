@@ -46,6 +46,12 @@ public class User extends BaseEntity implements UserDetails {
     @JsonIgnore
     private List<Event> events;
 
+    @OneToMany(mappedBy = "user")
+    @ToString.Exclude
+    @ElementCollection
+    @JsonIgnore
+    private List<Text> texts;
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;

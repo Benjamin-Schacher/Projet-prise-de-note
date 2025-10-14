@@ -6,6 +6,7 @@ import {Calendar} from "./pages/Calendar.jsx"
 import {Login} from "./pages/Login.jsx"
 import {Note} from "./pages/Note.jsx"
 import {Subscribe} from "./pages/Subscribe.jsx"
+import TextEditorPage from "./pages/TextEditorPage.jsx";
 
     function App() {
         const router = createBrowserRouter([
@@ -17,7 +18,8 @@ import {Subscribe} from "./pages/Subscribe.jsx"
                     { path: "/note", element: <Note /> },
                     { path: "/connexion", element: <Login /> },
                     { path: "/subscribe", element: <Subscribe /> },
-                    { path: "/calendar", element: <Calendar /> }
+                    { path: "/calendar", element: <Calendar /> },
+                    { path: "/text", element: <TextEditorPage /> },
                 ],
             },
         ]);

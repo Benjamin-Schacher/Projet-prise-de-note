@@ -39,6 +39,9 @@ export const Navbar = () => {
                         	<HeaderItem href="/calendar">Calendrier</HeaderItem>
                         </li>
 						<li>
+							<HeaderItem href="/text">Textes</HeaderItem>
+						</li>
+						<li>
 							{isAuth ? (
 								<button className="nav-btn-in" onClick={handleLogout}>
 									Déconnexion
