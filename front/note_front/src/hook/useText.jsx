@@ -1,14 +1,17 @@
 import { useInstanceAxios } from "./useInstanceAxios";
 import { useState, useEffect, useRef } from "react";
 import { debounce } from 'lodash';
+import { useNavigate } from "react-router-dom";
 
 export const useText = () => {
   const api = useInstanceAxios();
   const [texts, setTexts] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   // Création d’une note
   const user_id = sessionStorage.getItem("id_user");
+
 
   function extractTitleFromContent(content) {
     setError(null);
@@ -92,6 +95,7 @@ export const useText = () => {
   const fetchTexts = () =>
     handleRequest(api.get, `text/user/${user_id}`);
 
+
   const addText = async ( content) => {
 
     const generatedTitle = extractTitleFromContent(content);
@@ -114,7 +118,7 @@ export const useText = () => {
     try {
       // Génère le title depuis le contenu
       const title = extractTitleFromContent(updatedFields.content);
-      //console.log("PATCH envoyé :", id, title, updatedFields);
+      console.log("PATCH envoyé :", id, title, updatedFields);
 
       // On combine content et title dans le même objet pour le patch
       const response = await api.patch(`/text/${id}`, { ...updatedFields, title });
@@ -143,8 +147,13 @@ const updateText = (id, updatedFields) => {
   const deleteText = (id) => api.delete(`/text/${id}`);
 
   useEffect(() => {
-    fetchTexts();
+    if (!user_id) {
+      navigate("/connexion");
+    } else {
+      fetchTexts();
+    }
   }, []);
+
 
   return {
     texts,

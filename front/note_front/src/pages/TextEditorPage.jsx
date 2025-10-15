@@ -3,6 +3,7 @@ import Sidebar from "../components/text/Sidebar";
 import { DefaultTemplate } from "../components/text/DefaultTemplate";
 import { useText } from "../hook/useText";
 import { lexkitJSONToMarkdown } from "../components/text/lexkitJSONToMarkdown";
+import { useNavigate } from "react-router-dom";
 
 export default function TextEditorPage() {
   const [selectedText, setSelectedText] = useState(null);
@@ -10,6 +11,7 @@ export default function TextEditorPage() {
   const editorRef = useRef(null);
   const [lastContent, setLastContent] = useState(null);
   const [isFocused, setIsFocused] = useState(false);
+  const navigate = useNavigate();
  
   // Ajouter un texte
   const handleAddText = async () => {
@@ -75,7 +77,7 @@ export default function TextEditorPage() {
 
     const updatedContent = editorRef.current.getJSON(); 
     //console.log("updatedContent : ", updatedContent);
-    
+
     const serializedContent = JSON.stringify(updatedContent);
    // console.log("serializedContent : ", serializedContent);
 
@@ -120,6 +122,9 @@ export default function TextEditorPage() {
       return () => clearInterval(interval);
     }, [selectedText, isFocused]);
 
+    /*if (loading) {
+      return navigate("/connexion");
+    }*/
     if (loading) return <section><h1>Une erreur est survenue...</h1></section>;
     if (error) return <section><h1>Une erreur est survenue...</h1></section>;
 

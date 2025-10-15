@@ -89,6 +89,10 @@ export function lexkitJSONToMarkdown(node: any): string {
         .join("\n") + "\n\n";
     case "listitem":
       return children + "\n";
+      
+    case "horizontalrule":
+      return `\n---\n\n`;
+
     case "link": {
       const linkText = children || (node.children?.map((c:any)=>c.text).join("") || "");
       const url = node.url || node.href || node.src || "";

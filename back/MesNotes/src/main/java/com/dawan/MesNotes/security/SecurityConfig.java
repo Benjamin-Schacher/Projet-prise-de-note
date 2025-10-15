@@ -28,7 +28,6 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
     private final CustomUserDetailsService userDetailsService;
     private final JwtUtils jwtUtils;
-    // JwtRequestFilter is now created as a @Bean to avoid circular dependency
 
     @Bean
     public PasswordEncoder passwordEncoder() {

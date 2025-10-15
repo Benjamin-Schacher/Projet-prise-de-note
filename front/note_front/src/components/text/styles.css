@@ -51,7 +51,7 @@
 
 /* Mode Tabs */
 .lexkit-mode-tabs {
-  display: flex;
+  display: none;
   border-bottom: 1px solid var(--lexkit-border);
 }
 
@@ -464,6 +464,11 @@
   position: relative;
   text-align: initial;
   overflow: scroll;
+}
+
+.lexkit-editor a {
+  color: blue;
+  cursor: pointer;
 }
 
 .lexkit-content-editable {

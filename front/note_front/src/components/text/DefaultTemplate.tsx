@@ -45,7 +45,7 @@ import {
   commandsToCommandPaletteItems,
   registerKeyboardShortcuts,
 } from "./commands";
-import { CommandPalette } from "./CommandPalette";
+//import { CommandPalette } from "./CommandPalette";
 import { createPortal } from "react-dom";
 import { defaultTheme } from "./theme";
 import "./styles.css";
@@ -90,7 +90,7 @@ export const extensions = [
   }),
   floatingToolbarExtension,
   contextMenuExtension,
-  commandPaletteExtension,
+  //commandPaletteExtension,
   new DraggableBlockExtension().configure({}),
 ] as const;
 
@@ -286,14 +286,12 @@ function Toolbar({
   activeStates,
   isDark,
   toggleTheme,
-  onCommandPaletteOpen,
 }: {
   commands: EditorCommands;
   hasExtension: (name: ExtensionNames) => boolean;
   activeStates: EditorStateQueries;
   isDark: boolean;
   toggleTheme: () => void;
-  onCommandPaletteOpen: () => void;
 }) {
   const { lexical: editor } = useEditor();
   const { handlers, fileInputRef } = useImageHandlers(commands, editor);
@@ -372,60 +370,10 @@ function Toolbar({
           </div>
         )}
 
-        {/* Horizontal Rule */}
-        {hasExtension("horizontalRule") && (
-          <div className="lexkit-toolbar-section">
-            <button onClick={() => commands.insertHorizontalRule()} className="lexkit-toolbar-button" title="Insert Horizontal Rule"><Minus size={16} /></button>
-          </div>
-        )}
-
         {/* Table */}
         {hasExtension("table") && (
           <div className="lexkit-toolbar-section">
             <button onClick={() => setShowTableDialog(true)} className="lexkit-toolbar-button" title="Insert Table (Ctrl+Shift+T)"><TableIcon size={16} /></button>
-          </div>
-        )}
-
-        {/* Image */}
-        {hasExtension("image") && (
-          <div className="lexkit-toolbar-section">
-            <Dropdown
-              trigger={<button className={`lexkit-toolbar-button ${activeStates.imageSelected ? "active" : ""}`} title="Insert Image"><ImageIcon size={16} /></button>}
-              isOpen={showImageDropdown}
-              onOpenChange={setShowImageDropdown}
-            >
-              <button className="lexkit-dropdown-item" onClick={() => { handlers.insertFromUrl(); setShowImageDropdown(false); }}><Link size={16} /> 
-                URL
-              </button>
-              <button className="lexkit-dropdown-item" onClick={() => { handlers.insertFromFile(); setShowImageDropdown(false); }}><Upload size={16} /> 
-                Fichier
-              </button>
-            </Dropdown>
-            {activeStates.imageSelected && (
-              <Dropdown
-                trigger={<button className="lexkit-toolbar-button" title="Align Image"><AlignCenter size={16} /></button>}
-                isOpen={showAlignDropdown}
-                onOpenChange={setShowAlignDropdown}
-              >
-                <button className="lexkit-dropdown-item" onClick={() => { handlers.setAlignment("left"); setShowAlignDropdown(false); }}><AlignLeft size={16} /> Aligner à Gauche</button>
-                <button className="lexkit-dropdown-item" onClick={() => { handlers.setAlignment("center"); setShowAlignDropdown(false); }}><AlignCenter size={16} /> Aligner au Centre</button>
-                <button className="lexkit-dropdown-item" onClick={() => { handlers.setAlignment("right"); setShowAlignDropdown(false); }}><AlignRight size={16} /> Aligner à Droite</button>
-                <button className="lexkit-dropdown-item" onClick={() => { handlers.setCaption(); setShowAlignDropdown(false); }}><Type size={16} /> Définir la légende</button>
-              </Dropdown>
-            )}
-            <input ref={fileInputRef} type="file" accept="image/*" onChange={handlers.handleUpload} className="lexkit-file-input" />
-          </div>
-        )}
-
-        {/* HTML Embed */}
-        {hasExtension("htmlEmbed") && (
-          <div className="lexkit-toolbar-section">
-            <button onClick={() => commands.insertHTMLEmbed()} className={`lexkit-toolbar-button ${activeStates.isHTMLEmbedSelected ? "active" : ""}`} title="Insert HTML Embed"><FileCode size={16} /></button>
-            {activeStates.isHTMLEmbedSelected && (
-              <button onClick={() => commands.toggleHTMLPreview()} className="lexkit-toolbar-button" title="Toggle Preview/Edit">
-                {activeStates.isHTMLPreviewMode ? <Eye size={16} /> : <Pencil size={16} />}
-              </button>
-            )}
           </div>
         )}
 
@@ -436,11 +384,6 @@ function Toolbar({
             <button onClick={() => commands.redo()} disabled={!activeStates.canRedo} className="lexkit-toolbar-button" title="Redo (Ctrl+Y)"><Redo size={16} /></button>
           </div>
         )}
-
-        {/* Command Palette */}
-        <div className="lexkit-toolbar-section">
-          <button onClick={onCommandPaletteOpen} className="lexkit-toolbar-button" title="Command Palette (Ctrl+K)"><Command size={16} /></button>
-        </div>
 
         {/* Theme Toggle */}
         <div className="lexkit-toolbar-section">
@@ -488,16 +431,6 @@ function ModeTabs({ mode, onModeChange }: { mode: EditorMode; onModeChange: (mod
   );
 }
 
-// HTML Source View
-function HTMLSourceView({ htmlContent, onHtmlChange }: { htmlContent: string; onHtmlChange: (html: string) => void }) {
-  return <textarea className="lexkit-html-view" value={htmlContent} onChange={(e) => onHtmlChange(e.target.value)} placeholder="Enter HTML content..." spellCheck={false} />;
-}
-
-// Markdown Source View
-function MarkdownSourceView({ markdownContent, onMarkdownChange }: { markdownContent: string; onMarkdownChange: (markdown: string) => void }) {
-  return <textarea className="lexkit-html-view" value={markdownContent} onChange={(e) => onMarkdownChange(e.target.value)} placeholder="Enter Markdown content..." spellCheck={false} />;
-}
-
 // Error Boundary
 function ErrorBoundary({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
@@ -518,7 +451,6 @@ function EditorContent({
   const { commands, hasExtension, activeStates, lexical: editor } = useEditor();
   const [mode, setMode] = useState<EditorMode>("visual");
   const [content, setContent] = useState({ html: "", markdown: "" });
-  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const commandsRef = useRef<EditorCommands>(commands);
   const readyRef = useRef(false);
 
@@ -565,19 +497,11 @@ function EditorContent({
 
   useEffect(() => {
     if (!editor || !commands) return;
-
-    const paletteCommands = commandsToCommandPaletteItems(commands);
-    paletteCommands.forEach((cmd) => commands.registerCommand(cmd));
-
-    const originalShowCommand = commands.showCommandPalette;
-    (commands as any).showCommandPalette = () => setCommandPaletteOpen(true);
-
     const unregisterShortcuts = registerKeyboardShortcuts(commands, document.body);
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         e.preventDefault();
-        setCommandPaletteOpen(true);
       }
     };
     document.addEventListener("keydown", handleKeyDown);
@@ -590,7 +514,6 @@ function EditorContent({
     return () => {
       unregisterShortcuts();
       document.removeEventListener("keydown", handleKeyDown);
-      (commands as any).showCommandPalette = originalShowCommand;
     };
   }, [editor, commands, onReady, methods]);
 
@@ -617,8 +540,6 @@ function EditorContent({
     }
   };
 
-  
-
   return (
     <>
       <div className="lexkit-editor-header">
@@ -630,7 +551,6 @@ function EditorContent({
             activeStates={activeStates}
             isDark={isDark}
             toggleTheme={toggleTheme}
-            onCommandPaletteOpen={() => setCommandPaletteOpen(true)}
           />
         )}
       </div>
@@ -638,15 +558,12 @@ function EditorContent({
         <div style={{ display: mode === "visual" ? "block" : "none" }}>
           <RichTextPlugin
             contentEditable={<ContentEditable className="lexkit-content-editable" />}
-            placeholder={<div className="lexkit-placeholder">Start typing...</div>}
+            placeholder={<div className="lexkit-placeholder">Saisissez du texte...</div>}
             ErrorBoundary={ErrorBoundary}
           />
           <FloatingToolbarRenderer />
         </div>
-        {mode === "html" && <HTMLSourceView htmlContent={content.html} onHtmlChange={handleHtmlChange} />}
-        {mode === "markdown" && <MarkdownSourceView markdownContent={content.markdown} onMarkdownChange={handleMarkdownChange} />}
       </div>
-      <CommandPalette isOpen={commandPaletteOpen} onClose={() => setCommandPaletteOpen(false)} commands={commandsToCommandPaletteItems(commands)} />
     </>
   );
 }
